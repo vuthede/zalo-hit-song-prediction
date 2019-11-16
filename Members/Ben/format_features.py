@@ -17,6 +17,7 @@ from ast import literal_eval as make_tuple
 def format_features(df):
     # Fill nan album
     print("There is {} ratio is nan album".format(len(df[df["album"].isnull()]) / len(df)))
+    df["album_raw_from_mp3_metadata"] = df["album"]
     df["album"] = df["album"].fillna("")
     df["len_album_name"] = df["album"].apply(lambda x: len(x.split(" ")))
     df["isRemixAlbum"] = [1 if "Remix" in t else 0 for t in df["album"]]
@@ -147,7 +148,10 @@ def format_features(df):
     ###
     '''from fast ai '''
     from pandas import DataFrame
-
+    import re
+    from functools import partial
+    import calendar
+    from typing import Sequence, Tuple, TypeVar, Union
     def ifnone(a, b):
         "`a` if `a` is not None, otherwise `b`."
         return b if a is None else a
@@ -160,8 +164,54 @@ def format_features(df):
         if not np.issubdtype(field_dtype, np.datetime64):
             df[date_field] = pd.to_datetime(df[date_field], infer_datetime_format=True)
 
+    def cyclic_dt_feat_names(time: bool = True, add_linear: bool = False):
+        "Return feature names of date/time cycles as produced by `cyclic_dt_features`."
+        fs = ['cos', 'sin']
+        attr = [f'{r}_{f}' for r in 'weekday day_month month_year day_year'.split() for f in fs]
+        if time: attr += [f'{r}_{f}' for r in 'hour clock min sec'.split() for f in fs]
+        if add_linear: attr.append('year_lin')
+        return attr
+
+    def cyclic_dt_features(d, time: bool = True, add_linear: bool = False):
+        "Calculate the cos and sin of date/time cycles."
+        tt, fs = d.timetuple(), [np.cos, np.sin]
+        day_year, days_month = tt.tm_yday, calendar.monthrange(d.year, d.month)[1]
+        days_year = 366 if calendar.isleap(d.year) else 365
+        rs = d.weekday() / 7, (d.day - 1) / days_month, (d.month - 1) / 12, (day_year - 1) / days_year
+        feats = [f(r * 2 * np.pi) for r in rs for f in fs]
+        if time and isinstance(d, datetime) and type(d) != date:
+            rs = tt.tm_hour / 24, tt.tm_hour % 12 / 12, tt.tm_min / 60, tt.tm_sec / 60
+            feats += [f(r * 2 * np.pi) for r in rs for f in fs]
+        if add_linear:
+            if type(d) == date:
+                feats.append(d.year + rs[-1])
+            else:
+                secs_in_year = (datetime(d.year + 1, 1, 1) - datetime(d.year, 1, 1)).total_seconds()
+                feats.append(d.year + ((d - datetime(d.year, 1, 1)).total_seconds() / secs_in_year))
+        return feats
+
+    def add_cyclic_datepart(df: DataFrame, field_name: str, prefix: str = None, drop: bool = True, time: bool = False,
+                            add_linear: bool = False):
+        "Helper function that adds trigonometric date/time features to a date in the column `field_name` of `df`."
+        make_date(df, field_name)
+        field = df[field_name]
+        prefix = ifnone(prefix, re.sub('[Dd]ate$', '', field_name))
+        series = field.apply(partial(cyclic_dt_features, time=time, add_linear=add_linear))
+        columns = [prefix + c for c in cyclic_dt_feat_names(time, add_linear)]
+        df_feats = pd.DataFrame([item for item in series], columns=columns, index=series.index)
+        for column in columns: df[column] = df_feats[column]
+        if drop: df.drop(field_name, axis=1, inplace=True)
+        return df
+
     def add_datepart(df: DataFrame, field_name: str, prefix: str = None, drop: bool = True, time: bool = False):
-        "Helper function that adds columns relevant to a date in the column `field_name` of `df`."
+        '''
+          'datetimeweekday_cos',
+        'datetimeweekday_sin', 'datetimeday_month_cos', 'datetimeday_month_sin',
+        'datetimemonth_year_cos', 'datetimemonth_year_sin',
+        'datetimeday_year_cos', 'datetimeday_year_sin'
+        Helper function that adds columns relevant to a date in the column `field_name`
+        of `df`.
+        '''
         make_date(df, field_name)
         field = df[field_name]
         prefix = ifnone(prefix, re.sub('[Dd]ate$', '', field_name))
@@ -174,16 +224,39 @@ def format_features(df):
         return df
 
     add_datepart(df, 'datetime', drop=False)  # inplace
-    ###
+    add_cyclic_datepart(df, 'datetime', drop=False) # inplace
+
+    df['title_truncated'] = df['title'].str.split('(', expand=True).loc[:, 0].str.rstrip().str.rstrip('!').str.rstrip(
+        '?')
+    #is_special_char_mask = df['title_truncated'].apply(lambda d: isStringContainSpecialCharacter(d))
+    print(
+        f"{len(df['title']) - df['title'].nunique()} raw titles are identical between songs: {df['title'].nunique()} unique titles")
+    print(
+        f"After cleaning brackets etc. only {df['title_truncated'].nunique()} unique titles remain, i.e. {df['title'].nunique() - df['title_truncated'].nunique()} are highly similar titles ")
+
+    # It seems like all songs on albums release at the same time, so groupby by release_time will create album
+    df["album_right"] = df.release_time.astype("category").cat.codes
+    df["albumHashAndName"] = df["album_hash"].fillna(df['album_raw_from_mp3_metadata'])
+    print(
+        f"In making albumHashandName, we filled in: "
+        f"{len(set(df[df['album_hash'].isnull()].index) - set(df[df['album_raw_from_mp3_metadata'].isnull()].index))} "
+        f"values Of the total albumHashAndName {df['albumHashAndName'].isnull().sum()} nan")
+    df["albumHashAndNameAndReleaseday"] = df["albumHashAndName"].fillna(df['album_right'])
+
+    print(
+        f"In making albumHashAndNameAndReleaseday, we filled in the: "
+        f"{len(set(df[df['albumHashAndName'].isnull()].index))} values remaining using the release second hash")
+    assert df['albumHashAndNameAndReleaseday'].isnull().sum() == 0
+
 
     ##############
     # These use knowledge of entire dataset X values
     ##############
-    # It seems like all songs on albums release at the same time, so groupby by release_time will create album
-    df["album_right"] = df.groupby(df.release_time).ngroup().astype("category").cat.codes
-    df["numsongInAlbum"] = df.groupby("album_right")["album_right"].transform("count")
+
+    df["numsongInAlbum"] = df.groupby("albumHashAndNameAndReleaseday")["albumHashAndNameAndReleaseday"].transform("count")
     df["isSingleAlbum_onesong"] = df["isSingleAlbum"] & (df["numsongInAlbum"] == 1)
 
+    '''
     # Find the number of songs which were released between 5-6 months from the datetime field == the release date
     def find_num_song_released_that_week(df, day):
         fromtime = day + relativedelta.relativedelta(days=7)
@@ -191,7 +264,7 @@ def format_features(df):
         return len(df.datetime[(df.datetime >= fromtime) & (df.datetime <= totime)])
 
     df["num_song_released_that_week"] = df.datetime.apply(lambda d: find_num_song_released_that_week(df, d))
-
+    '''
     # Find the number of songs which were released between 5-6 months from the datetime field == the release date
     def find_num_song_release_in_final_month(df, day):
         month5th = day + relativedelta.relativedelta(months=5)
@@ -212,9 +285,11 @@ def format_features(df):
     df["freq_artist_min"] = df.groupby('_artist_id_min_cat')['_artist_id_min_cat'].transform('count').astype('float')
     df["freq_composer_min"] = df.groupby('_composers_id_min_cat')['_composers_id_min_cat'].transform('count').astype(
         'float')
-    df["num_album_per_min_artist"] = df.groupby(['_artist_id_min_cat', 'album'])['album'].transform('count').astype(
+    df["num_album_per_min_artist"] = df.groupby(['_artist_id_min_cat', 'albumHashAndNameAndReleaseday'])['albumHashAndNameAndReleaseday'].transform('count').astype(
         'float')
-    df["num_album_per_min_composer"] = df.groupby(['composers_id_min', 'album'])['album'].transform('count').astype(
+    df["num_album_per_min_composer"] = df.groupby(['composers_id_min', 'albumHashAndNameAndReleaseday'])['albumHashAndNameAndReleaseday'].transform('count').astype(
         'float')
+
+    df = df.drop(['album', 'album_right', 'album_hash'], axis = 1)
 
     return df

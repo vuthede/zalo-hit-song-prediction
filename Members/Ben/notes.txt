@@ -1,0 +1,11 @@
+* all type casting and encoding is done in post-processing not during dataframe preparation - allows seperation of choice of encoding from data prep/cleaning
+* added cyclical time features
+* Merged album 3 features (Name, Image, ReleaseSecond) into one feature albumHashAndNameAndReleaseday
+    In making albumHashandName, we filled in: 146 values Of the total albumHashAndName 171 nan
+    In making albumHashAndNameAndReleaseday, filled in the: 171 values remaining using the release second
+    * removed album and album_right features
+    * Updated numsongInAlbum, num_album_per_min_artist, num_album_per_min_composer features accordingly 
+* Added function to measure mutual information of numericla features
+* Added title category, and further filtered titles  to remove ending with ! and () like (Beat), as these are basically same title. 
+    2711 raw titles are identical between songs: 7485 unique titles
+    After cleaning brackets etc. only 6202 unique titles, i.e. 1283 are highly similar titles 

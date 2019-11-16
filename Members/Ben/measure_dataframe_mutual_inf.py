@@ -1,8 +1,8 @@
 from sklearn.model_selection import StratifiedKFold
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.feature_selection import mutual_info_classif
-
-def get_numerical_mutual_info(df):
+import pandas as pd
+def get_numerical_mutual_info(df, all_features_in_order_list):
     df_train = df[df.dataset=="train"]
     n_splits=3
     folds = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=99999)
@@ -21,7 +21,8 @@ def get_numerical_mutual_info(df):
     return (pd.Series(numeric_information_series)/n_splits).sort_values()
 
 def get_categorical_mutual_info():
-    # TODO rename variables from numeric to categorical
+    # TODo rename variables from numeric to categorical
+    # ToDo deal with missing values etc.
     df_train = df[df.dataset=="train"]
     n_splits=3
     folds = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=99999)
