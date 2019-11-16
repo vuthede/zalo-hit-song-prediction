@@ -13,7 +13,7 @@ from dateutil import relativedelta
 from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
 from ast import literal_eval as make_tuple
-
+from scipy.stats import ttest_ind
 def format_features(df):
     # Fill nan album
     print("There is {} ratio is nan album".format(len(df[df["album"].isnull()]) / len(df)))
@@ -249,6 +249,30 @@ def format_features(df):
     assert df['albumHashAndNameAndReleaseday'].isnull().sum() == 0
 
 
+    import re
+    def isContainsSpecialChar(string):
+        # Make own character set and pass
+        # this as argument in compile method
+        regex = re.compile('^.*[^a-zA-Z0-9_]')  # [@_!#$%^&*()<>?/\|}{~:]
+
+        # Pass the string in search
+        # method of regex object.
+        if (regex.search(string) == None):
+            return False
+
+        else:
+            return True
+    df['title_truncated'] = df['title'].str.split('(', expand=True).loc[:, 0].str.rstrip().str.rstrip('!').str.rstrip(
+        '?')
+    is_special_char_mask = df['title_truncated'].apply(lambda d: isContainsSpecialChar(d))
+    _df_train = df[df.dataset == "train"]
+    english_like_names = _df_train.loc[_df_train['title_truncated'][~is_special_char_mask].index]['label']
+    test = ttest_ind(_df_train['label'], english_like_names)
+    if test.pvalue < 0.05:
+        print(
+            "There is a statistically signficiant relationship between English-like title and rank. So adding feature: isEnglishLikeTitle")
+    df['isEnglishLikeTitle'] = ~is_special_char_mask
+
     ##############
     # These use knowledge of entire dataset X values
     ##############
@@ -293,3 +317,24 @@ def format_features(df):
     df = df.drop(['album', 'album_right', 'album_hash'], axis = 1)
 
     return df
+
+
+def baysianEncodeFeature(df, featurename, prior_weight, fillmissing, suffix='_baysencoded'):
+    '''Returns new df '''
+    import xam
+
+    encoder = xam.feature_extraction.BayesianTargetEncoder(
+        columns=[featurename, ],
+        prior_weight=prior_weight,
+        suffix=suffix)
+    encoder.fit(df[df.dataset == "train"][[featurename]], df[df.dataset == "train"].label)
+
+    # assert (df_train.dataset != 'train').sum() == 0, "y and x labels should only come from training data"
+    # transform whole dataset including test set but trained only on X and y from train
+    _resulting_df = encoder.transform(df[[featurename]], df.label)
+    _resulting_df[featurename + suffix] = _resulting_df[featurename + suffix].astype('float64')
+    _resulting_df[featurename + suffix].fillna(fillmissing, inplace=True)
+
+    # Add the column to original df
+    df[featurename + suffix] = _resulting_df[featurename + suffix].round(0).astype('int64')
+    return df   
