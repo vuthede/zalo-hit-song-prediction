@@ -3,34 +3,13 @@
 ```
 %load_ext autoreload
 %autoreload 2
-import sys
-sys.path.insert('../../src/')
-import pandas as pd
-import numpy as np
-import random
-import os
-import lightgbm as lgb
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-from sklearn.externals import joblib
-import pandas as pd
-from format_features import baysianEncodeFeature
-from utils import print_data_types
-from utils import get_data
-from format_features import format_features, assign_artist_features_inplace
-from typecast_features import typecast_features
-
 np.random.seed(1)
 random.seed(1)
 DATA_DIR = "/media/DATA/zalo-hit-song-prediction/csv/"
 df = get_data(DATA_DIR)
 df = format_features(df)
-all_features_in_order_list, df = typecast_features(df)
-df = assign_artist_features_inplace(df)
+all_features_in_order_list, df = typecast_features(df, cast_to_catcode=True)
+df = assign_artist_features_inplace(df )
 ```
 
 # Example Baseline

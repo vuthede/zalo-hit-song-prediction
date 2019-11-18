@@ -18,7 +18,7 @@ def add_raw_audio_features(df, all_features_in_order):
     all_features_in_order.update(audio_feature_names_dict)
     return all_features_in_order
 
-def typecast_features(df):
+def typecast_features(df, cast_to_catcode=True):
     all_features_in_order = {
         ## album is Redundant feature use: albumHashAndNameAndReleaseday", # album name from mp3 metadata textual
         "albumHashAndNameAndReleaseday": "category",
@@ -109,5 +109,13 @@ def typecast_features(df):
         except ValueError:
             print(feat_name, feat_type)
             raise
+    if cast_to_catcode:
+        df = cast_cat_dtype_to_cat_codes(df, all_features_in_order_list)
 
     return all_features_in_order_list, df
+
+def cast_cat_dtype_to_cat_codes(df, column_names):
+    for colname in df[column_names].select_dtypes(include=['category']).columns :
+        df[colname] = df[colname].cat.codes
+        # Lightgbm also assumes integer casting is provided
+    return df
