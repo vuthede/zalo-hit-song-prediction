@@ -14,7 +14,14 @@ from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
 from ast import literal_eval as make_tuple
 from scipy.stats import ttest_ind
+from functools import reduce
+from datetime import datetime
+import re
+
 def format_features(df):
+    # Fill missing copyright across train and test with fixed values
+    df["copyright"] = df["copyright"].fillna("UnavailableInformation")
+
     # Fill nan album
     print("There is {} ratio is nan album".format(len(df[df["album"].isnull()]) / len(df)))
     df["album_raw_from_mp3_metadata"] = df["album"]
@@ -30,34 +37,6 @@ def format_features(df):
     df["isLienKhucAlbum"] = [1 if "Liên Khúc" in t else 0 for t in df["album"]]
 
     df["album_name_is_title_name"] = [1 if r.title in r.album else 0 for i, r in df.iterrows()]
-
-    df["artist_name"] = df["artist_name"].astype('category')
-    df["composers_name"] = df["composers_name"].astype('category')
-    df["copyright"] = df["copyright"].astype('category')
-
-
-    import re
-    def get_min_artist_id(s):
-        ps = re.split(',|\.', s)
-        ps = [int(p) for p in ps]
-        return np.min(ps)
-
-    def get_max_artist_id(s):
-        ps = re.split(',|\.', s)
-        ps = [int(p) for p in ps]
-        return np.max(ps)
-
-
-    df["artist_id_min"] = df["artist_id"].apply(lambda x: get_min_artist_id(x))
-    df["artist_id_max"] = df["artist_id"].apply(lambda x: get_max_artist_id(x))
-    df["composers_id_min"] = df["composers_id"].apply(lambda x: get_min_artist_id(x))
-    df["composers_id_max"] = df["composers_id"].apply(lambda x: get_max_artist_id(x))
-
-    # New feature
-    # df["group_album_artist_id_min_cat"] = df.groupby(["album","artist_id_min_cat"]).ngroup()
-    # df["group_album_artist_id_min_cat"] = df["group_album_artist_id_min_cat"].astype("category").cat.codes
-    # df["group_album_artist_id_max_cat"] = df.groupby(["album","artist_id_max_cat"]).ngroup()
-    # df["group_album_artist_id_max_cat"] = df["group_album_artist_id_max_cat"].astype("category").cat.codes
 
     # Fill genre
     print("There is {} ratio is nan genre".format(len(df[df["genre"].isnull()]) / len(df)))
@@ -273,6 +252,35 @@ def format_features(df):
             "There is a statistically signficiant relationship between English-like title and rank. So adding feature: isEnglishLikeTitle")
     df['isEnglishLikeTitle'] = ~is_special_char_mask
 
+
+    import re
+    def get_min_artist_id(s):
+        ps = re.split(',|\.', s)
+        ps = [int(p) for p in ps]
+        return np.min(ps)
+
+    def get_max_artist_id(s):
+        ps = re.split(',|\.', s)
+        ps = [int(p) for p in ps]
+        return np.max(ps)
+
+    df["artist_id_min"] = df["artist_id"].apply(lambda x: get_min_artist_id(x))
+    df["artist_id_min_cat"] = df["artist_id_min"].astype('category')
+    df["artist_id_min_cat"] = df["artist_id_min_cat"].cat.codes
+
+    df["composers_id_min"] = df["composers_id"].apply(lambda x: get_min_artist_id(x))
+    df["composers_id_min_cat"] = df["composers_id_min"].astype('category')
+    df["composers_id_min_cat"] = df["composers_id_min_cat"].cat.codes
+
+    df["artist_id_max"] = df["artist_id"].apply(lambda x: get_max_artist_id(x))
+    df["artist_id_max_cat"] = df["artist_id_max"].astype('category')
+    df["artist_id_max_cat"] = df["artist_id_max_cat"].cat.codes
+
+    df["composers_id_max"] = df["composers_id"].apply(lambda x: get_max_artist_id(x))
+    df["composers_id_max_cat"] = df["composers_id_max"].astype('category')
+    df["composers_id_max_cat"] = df["composers_id_max_cat"].cat.codes
+
+    df["num_same_title"] = df.groupby("title")["title"].transform("count")
     ##############
     # These use knowledge of entire dataset X values
     ##############
@@ -300,11 +308,13 @@ def format_features(df):
     df["freq_artist"] = df.groupby('artist_id')['artist_id'].transform('count').astype('float')
     df["freq_composer"] = df.groupby('composers_id')['composers_id'].transform('count').astype('float')
 
+
     df["_artist_id_min_cat"] = df["artist_id_min"].astype('category')
     df["_artist_id_min_cat"] = df["_artist_id_min_cat"].cat.codes
 
     df["_composers_id_min_cat"] = df["composers_id_min"].astype('category')
     df["_composers_id_min_cat"] = df["_composers_id_min_cat"].cat.codes
+
 
     df["freq_artist_min"] = df.groupby('_artist_id_min_cat')['_artist_id_min_cat'].transform('count').astype('float')
     df["freq_composer_min"] = df.groupby('_composers_id_min_cat')['_composers_id_min_cat'].transform('count').astype(
@@ -314,12 +324,12 @@ def format_features(df):
     df["num_album_per_min_composer"] = df.groupby(['composers_id_min', 'albumHashAndNameAndReleaseday'])['albumHashAndNameAndReleaseday'].transform('count').astype(
         'float')
 
-    df = df.drop(['album', 'album_right', 'album_hash'], axis = 1)
+    df = df.drop(['album', 'album_hash'], axis = 1)
 
     return df
 
 
-def baysianEncodeFeature(df, featurename, prior_weight, fillmissing, suffix='_baysencoded'):
+def baysianEncodeFeature(df_train, trn_idx, featurename, prior_weight, fillmissing, suffix='_baysencoded'):
     '''Returns new df '''
     import xam
 
@@ -327,14 +337,171 @@ def baysianEncodeFeature(df, featurename, prior_weight, fillmissing, suffix='_ba
         columns=[featurename, ],
         prior_weight=prior_weight,
         suffix=suffix)
-    encoder.fit(df[df.dataset == "train"][[featurename]], df[df.dataset == "train"].label)
 
-    # assert (df_train.dataset != 'train').sum() == 0, "y and x labels should only come from training data"
-    # transform whole dataset including test set but trained only on X and y from train
-    _resulting_df = encoder.transform(df[[featurename]], df.label)
+    train_df_fold = df_train.iloc[trn_idx]
+
+    encoder.fit(train_df_fold[[featurename]], train_df_fold.label)
+
+    _resulting_df = encoder.transform(df_train[[featurename]], df_train.label)
     _resulting_df[featurename + suffix] = _resulting_df[featurename + suffix].astype('float64')
     _resulting_df[featurename + suffix].fillna(fillmissing, inplace=True)
 
-    # Add the column to original df
-    df[featurename + suffix] = _resulting_df[featurename + suffix].round(0).astype('int64')
-    return df   
+    # Add the column to original df_train
+    df_train[featurename + suffix] = _resulting_df[featurename + suffix]#.round(0).astype('int64')
+    return df_train
+
+
+from functools import reduce
+
+
+def create_album_score_lookup_table(df):
+    data = df.groupby('album_right').label.agg(["mean", "std", "count"])
+    return data
+
+
+def create_artist_score_lookup_table(df):
+    def split_id(s):
+        return re.split(',|\.', s)
+
+    def mask_row_contain_artist_id(df, artist_id):
+        r = df.artist_id.apply(lambda x: artist_id in split_id(x))
+        return r
+
+    # Get all artist ids
+    artist_group = df.artist_id.unique()
+    artist_ids = reduce(lambda l, e: l + split_id(e), artist_group, [])
+    artist_ids = list(set(artist_ids))
+    # Get data
+    data = [df[mask_row_contain_artist_id(df, artist_id)].label.agg(["mean", "std", "count", "median"])
+            for artist_id in artist_ids]
+    new_df = pd.DataFrame(data=data)
+    new_df["artist_id"] = artist_ids
+    return new_df.set_index("artist_id")
+
+
+def create_album_score_lookup_table(df):
+    data = df.groupby('album_right').label.agg(["mean", "std", "count"])
+    return data
+
+def create_artist_score_lookup_table(df):
+    def split_id(s):
+        return re.split(',|\.', s)
+
+    def mask_row_contain_artist_id(df, artist_id):
+        r = df.artist_id.apply(lambda x: artist_id in split_id(x))
+        return r
+
+    # Get all artist ids
+    artist_group = df.artist_id.unique()
+    artist_ids = reduce(lambda l, e: l + split_id(e), artist_group, [])
+    artist_ids = list(set(artist_ids))
+    # Get data
+    data = [df[mask_row_contain_artist_id(df, artist_id)].label.agg(["mean", "std", "count", "median"])
+            for artist_id in artist_ids]
+    new_df = pd.DataFrame(data=data)
+    new_df["artist_id"] = artist_ids
+    return new_df.set_index("artist_id")
+
+def get_field_by_key(table, k, field="mean"):
+    if k in table.index:
+        return table.loc[k][field]
+    return np.nan
+
+def get_value_by_key(table, k):
+    if k in table.index:
+        return table.loc[k], False
+    return np.nan, True
+
+def assign_value(album_table, artist_table, r):
+    d1, isnul1 = get_value_by_key(album_table, r.album_right)
+    d2, isnul2 = get_value_by_key(artist_table, r.artist_id_min_cat)
+    #     print(type(d2),isnul2)
+    if isnul1 and isnul2:
+        return np.nan
+    elif isnul1 and d2["std"] < 2:
+        return d2["mean"]
+    elif isnul2 and d1["std"] < 2:
+        return d1["mean"]
+
+    elif not isnul1 and d1["std"] < 2 and not isnul2 and d2["std"] < 2:
+        return d1["mean"]
+
+    return np.nan
+
+def assign_artist_features_inplace(df):
+
+    def split_id(s):
+        return re.split(',|\.', s)
+
+    m = df.artist_id.unique()
+    idx_lst = []
+    for idx in m:
+        ps = split_id(idx)
+        for i in ps:
+            idx_lst.append(i)
+
+    id_lst = list(set(idx_lst))
+
+    def condition(df, artist_id):
+        r = df.artist_id.apply(lambda x: artist_id in split_id(x))
+        return r
+
+    df_train = df[df.dataset == "train"]
+    data = [df_train[condition(df_train, artist_id)].label.agg(["mean", "std", "count"]) for artist_id in id_lst]
+    new_df = pd.DataFrame(data=data)
+    new_df["artist_id"] = id_lst
+
+    new_df.dropna(inplace=True)
+    new_df.set_index('artist_id', inplace=True)
+    art_dict = new_df.to_dict()
+
+    def best_count_id(values):
+        ids = split_id(values)
+        temp_mean = 0
+        temp_id = str(min([int(a) for a in ids]))
+        for id in ids:
+            try:
+                if art_dict['count'][id] > temp_mean:
+                    temp_mean = art_dict['count'][id]
+                    temp_id = id
+            except:
+                temp_mean = temp_mean
+                temp_id = temp_id
+        return temp_id
+
+    def best_mean_id(values):
+        ids = split_id(values)
+        temp_mean = 10
+        temp_id = str(min([int(a) for a in ids]))
+        for id in ids:
+            try:
+                if art_dict['mean'][id] < temp_mean:
+                    temp_mean = art_dict['mean'][id]
+                    temp_id = id
+            except:
+                temp_mean = temp_mean
+                temp_id = temp_id
+        return temp_id
+
+    def best_std_id(values):
+        ids = split_id(values)
+        temp_std = 10
+        temp_id = str(min([int(a) for a in ids]))
+        for id in ids:
+            try:
+                if art_dict['std'][id] < temp_std:
+                    temp_std = art_dict['std'][id]
+                    temp_id = id
+            except:
+                temp_std = temp_std
+                temp_id = temp_id
+        return temp_id
+
+    df['artist_count_id'] = df['artist_id'].apply(best_count_id)
+    df['artist_mean_id'] = df['artist_id'].apply(best_mean_id)
+    df['artist_std_id'] = df['artist_id'].apply(best_std_id)
+    df['artist_mean_id'] = df['artist_mean_id'].astype("category")
+    df['artist_std_id'] = df['artist_std_id'].astype("category")
+    df['artist_count_id'] = df['artist_count_id'].astype("category")
+
+    return df
