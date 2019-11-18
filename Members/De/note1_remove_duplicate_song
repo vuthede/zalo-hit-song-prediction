@@ -1,0 +1,363 @@
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53813	valid_1's rmse: 1.84518
+[10000]	training's rmse: 1.24683	valid_1's rmse: 1.70967
+[15000]	training's rmse: 1.08885	valid_1's rmse: 1.65506
+[20000]	training's rmse: 0.976065	valid_1's rmse: 1.62378
+[25000]	training's rmse: 0.888704	valid_1's rmse: 1.60375
+[30000]	training's rmse: 0.818672	valid_1's rmse: 1.58997
+[35000]	training's rmse: 0.758844	valid_1's rmse: 1.58051
+[40000]	training's rmse: 0.707561	valid_1's rmse: 1.57302
+[45000]	training's rmse: 0.662273	valid_1's rmse: 1.56762
+[50000]	training's rmse: 0.621896	valid_1's rmse: 1.56325
+[55000]	training's rmse: 0.585946	valid_1's rmse: 1.55967
+[60000]	training's rmse: 0.553235	valid_1's rmse: 1.55691
+[65000]	training's rmse: 0.523333	valid_1's rmse: 1.55467
+[70000]	training's rmse: 0.49593	valid_1's rmse: 1.55275
+[75000]	training's rmse: 0.470776	valid_1's rmse: 1.55134
+[80000]	training's rmse: 0.447478	valid_1's rmse: 1.5505
+[85000]	training's rmse: 0.42595	valid_1's rmse: 1.54972
+[90000]	training's rmse: 0.406028	valid_1's rmse: 1.54916
+[95000]	training's rmse: 0.387276	valid_1's rmse: 1.54877
+[100000]	training's rmse: 0.369795	valid_1's rmse: 1.54851
+[105000]	training's rmse: 0.353663	valid_1's rmse: 1.5484
+[110000]	training's rmse: 0.338472	valid_1's rmse: 1.54814
+[115000]	training's rmse: 0.32402	valid_1's rmse: 1.54818
+[120000]	training's rmse: 0.310476	valid_1's rmse: 1.54808
+[125000]	training's rmse: 0.297819	valid_1's rmse: 1.54819
+[130000]	training's rmse: 0.286031	valid_1's rmse: 1.54819
+[135000]	training's rmse: 0.274939	valid_1's rmse: 1.54837
+Early stopping, best iteration is:
+[119067]	training's rmse: 0.312988	valid_1's rmse: 1.54804
+Fold 1
+Percentage null in valid: 0.22941822173435786
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53818	valid_1's rmse: 1.79498
+[10000]	training's rmse: 1.24109	valid_1's rmse: 1.67715
+[15000]	training's rmse: 1.08076	valid_1's rmse: 1.63844
+[20000]	training's rmse: 0.967173	valid_1's rmse: 1.61941
+[25000]	training's rmse: 0.879906	valid_1's rmse: 1.60869
+[30000]	training's rmse: 0.810047	valid_1's rmse: 1.60086
+[35000]	training's rmse: 0.750598	valid_1's rmse: 1.59554
+[40000]	training's rmse: 0.699292	valid_1's rmse: 1.59152
+[45000]	training's rmse: 0.653896	valid_1's rmse: 1.58839
+[50000]	training's rmse: 0.613484	valid_1's rmse: 1.58553
+[55000]	training's rmse: 0.577849	valid_1's rmse: 1.58338
+[60000]	training's rmse: 0.545173	valid_1's rmse: 1.58165
+[65000]	training's rmse: 0.515446	valid_1's rmse: 1.58036
+[70000]	training's rmse: 0.48836	valid_1's rmse: 1.5793
+[75000]	training's rmse: 0.463354	valid_1's rmse: 1.57815
+[80000]	training's rmse: 0.440263	valid_1's rmse: 1.57738
+[85000]	training's rmse: 0.419007	valid_1's rmse: 1.57687
+[90000]	training's rmse: 0.39905	valid_1's rmse: 1.57615
+[95000]	training's rmse: 0.380634	valid_1's rmse: 1.57578
+[100000]	training's rmse: 0.363592	valid_1's rmse: 1.57562
+[105000]	training's rmse: 0.347622	valid_1's rmse: 1.57542
+[110000]	training's rmse: 0.332497	valid_1's rmse: 1.57526
+[115000]	training's rmse: 0.318148	valid_1's rmse: 1.57509
+[120000]	training's rmse: 0.304886	valid_1's rmse: 1.57501
+[125000]	training's rmse: 0.292494	valid_1's rmse: 1.57499
+[130000]	training's rmse: 0.280899	valid_1's rmse: 1.57503
+[135000]	training's rmse: 0.269932	valid_1's rmse: 1.57497
+[140000]	training's rmse: 0.259459	valid_1's rmse: 1.57509
+[145000]	training's rmse: 0.249507	valid_1's rmse: 1.57517
+[150000]	training's rmse: 0.240232	valid_1's rmse: 1.57516
+Early stopping, best iteration is:
+[133696]	training's rmse: 0.272783	valid_1's rmse: 1.57492
+Fold 2
+Percentage null in valid: 0.2299229922992299
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53847	valid_1's rmse: 1.82309
+[10000]	training's rmse: 1.24445	valid_1's rmse: 1.68252
+[15000]	training's rmse: 1.08563	valid_1's rmse: 1.62835
+[20000]	training's rmse: 0.972668	valid_1's rmse: 1.59701
+[25000]	training's rmse: 0.88549	valid_1's rmse: 1.5766
+[30000]	training's rmse: 0.815207	valid_1's rmse: 1.56165
+[35000]	training's rmse: 0.755672	valid_1's rmse: 1.55081
+[40000]	training's rmse: 0.704303	valid_1's rmse: 1.54232
+[45000]	training's rmse: 0.659538	valid_1's rmse: 1.53558
+[50000]	training's rmse: 0.619391	valid_1's rmse: 1.53054
+[55000]	training's rmse: 0.583416	valid_1's rmse: 1.52641
+[60000]	training's rmse: 0.550756	valid_1's rmse: 1.523
+[65000]	training's rmse: 0.52092	valid_1's rmse: 1.52032
+[70000]	training's rmse: 0.493699	valid_1's rmse: 1.51811
+[75000]	training's rmse: 0.468655	valid_1's rmse: 1.5163
+[80000]	training's rmse: 0.445463	valid_1's rmse: 1.51465
+[85000]	training's rmse: 0.424054	valid_1's rmse: 1.51327
+[90000]	training's rmse: 0.403945	valid_1's rmse: 1.51229
+[95000]	training's rmse: 0.385514	valid_1's rmse: 1.51132
+[100000]	training's rmse: 0.368202	valid_1's rmse: 1.51061
+[105000]	training's rmse: 0.352121	valid_1's rmse: 1.51012
+[110000]	training's rmse: 0.33694	valid_1's rmse: 1.50969
+[115000]	training's rmse: 0.322612	valid_1's rmse: 1.50923
+[120000]	training's rmse: 0.30911	valid_1's rmse: 1.50868
+[125000]	training's rmse: 0.296386	valid_1's rmse: 1.50833
+[130000]	training's rmse: 0.284679	valid_1's rmse: 1.50798
+[135000]	training's rmse: 0.273537	valid_1's rmse: 1.50779
+[140000]	training's rmse: 0.262834	valid_1's rmse: 1.50763
+[145000]	training's rmse: 0.252802	valid_1's rmse: 1.50739
+[150000]	training's rmse: 0.243371	valid_1's rmse: 1.50743
+[155000]	training's rmse: 0.234616	valid_1's rmse: 1.50731
+[160000]	training's rmse: 0.226186	valid_1's rmse: 1.50732
+[165000]	training's rmse: 0.218047	valid_1's rmse: 1.50724
+[170000]	training's rmse: 0.210302	valid_1's rmse: 1.50715
+[175000]	training's rmse: 0.203015	valid_1's rmse: 1.50714
+[180000]	training's rmse: 0.196139	valid_1's rmse: 1.50716
+[185000]	training's rmse: 0.189449	valid_1's rmse: 1.50718
+[190000]	training's rmse: 0.183127	valid_1's rmse: 1.50724
+[195000]	training's rmse: 0.177147	valid_1's rmse: 1.5072
+[200000]	training's rmse: 0.171326	valid_1's rmse: 1.50732
+Early stopping, best iteration is:
+[182383]	training's rmse: 0.192883	valid_1's rmse: 1.5071
+Fold 3
+Percentage null in valid: 0.2299229922992299
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.54208	valid_1's rmse: 1.81484
+[10000]	training's rmse: 1.24878	valid_1's rmse: 1.65816
+[15000]	training's rmse: 1.09024	valid_1's rmse: 1.59996
+[20000]	training's rmse: 0.977299	valid_1's rmse: 1.56802
+[25000]	training's rmse: 0.890401	valid_1's rmse: 1.54834
+[30000]	training's rmse: 0.820509	valid_1's rmse: 1.53598
+[35000]	training's rmse: 0.76087	valid_1's rmse: 1.52745
+[40000]	training's rmse: 0.709327	valid_1's rmse: 1.52104
+[45000]	training's rmse: 0.663737	valid_1's rmse: 1.51659
+[50000]	training's rmse: 0.623372	valid_1's rmse: 1.51298
+[55000]	training's rmse: 0.587109	valid_1's rmse: 1.51063
+[60000]	training's rmse: 0.554082	valid_1's rmse: 1.50865
+[65000]	training's rmse: 0.523783	valid_1's rmse: 1.50752
+[70000]	training's rmse: 0.496056	valid_1's rmse: 1.50646
+[75000]	training's rmse: 0.470776	valid_1's rmse: 1.5057
+[80000]	training's rmse: 0.447304	valid_1's rmse: 1.50491
+[85000]	training's rmse: 0.4255	valid_1's rmse: 1.50451
+[90000]	training's rmse: 0.405333	valid_1's rmse: 1.50432
+[95000]	training's rmse: 0.386474	valid_1's rmse: 1.5042
+[100000]	training's rmse: 0.36897	valid_1's rmse: 1.50417
+[105000]	training's rmse: 0.352709	valid_1's rmse: 1.50414
+[110000]	training's rmse: 0.33739	valid_1's rmse: 1.50447
+Early stopping, best iteration is:
+[92850]	training's rmse: 0.394323	valid_1's rmse: 1.50408
+Fold 4
+Percentage null in valid: 0.2299229922992299
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53275	valid_1's rmse: 1.87572
+[10000]	training's rmse: 1.24009	valid_1's rmse: 1.73716
+[15000]	training's rmse: 1.08178	valid_1's rmse: 1.68527
+[20000]	training's rmse: 0.96923	valid_1's rmse: 1.65752
+[25000]	training's rmse: 0.88212	valid_1's rmse: 1.64106
+[30000]	training's rmse: 0.812015	valid_1's rmse: 1.62901
+[35000]	training's rmse: 0.752354	valid_1's rmse: 1.62005
+[40000]	training's rmse: 0.700953	valid_1's rmse: 1.61352
+[45000]	training's rmse: 0.655331	valid_1's rmse: 1.60867
+[50000]	training's rmse: 0.614642	valid_1's rmse: 1.60483
+[55000]	training's rmse: 0.578581	valid_1's rmse: 1.6023
+[60000]	training's rmse: 0.545766	valid_1's rmse: 1.60023
+[65000]	training's rmse: 0.515892	valid_1's rmse: 1.59875
+[70000]	training's rmse: 0.488435	valid_1's rmse: 1.59772
+[75000]	training's rmse: 0.463263	valid_1's rmse: 1.59657
+[80000]	training's rmse: 0.440052	valid_1's rmse: 1.59605
+[85000]	training's rmse: 0.418446	valid_1's rmse: 1.5957
+[90000]	training's rmse: 0.39826	valid_1's rmse: 1.59552
+[95000]	training's rmse: 0.379493	valid_1's rmse: 1.59533
+[100000]	training's rmse: 0.362169	valid_1's rmse: 1.5952
+[105000]	training's rmse: 0.346102	valid_1's rmse: 1.59517
+[110000]	training's rmse: 0.330895	valid_1's rmse: 1.59534
+[115000]	training's rmse: 0.316436	valid_1's rmse: 1.59541
+[120000]	training's rmse: 0.30311	valid_1's rmse: 1.59537
+Early stopping, best iteration is:
+[103604]	training's rmse: 0.350572	valid_1's rmse: 1.59505
+Fold 5
+Percentage null in valid: 0.23042998897464168
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53319	valid_1's rmse: 1.89214
+[10000]	training's rmse: 1.23868	valid_1's rmse: 1.76299
+[15000]	training's rmse: 1.08025	valid_1's rmse: 1.71487
+[20000]	training's rmse: 0.968437	valid_1's rmse: 1.68857
+[25000]	training's rmse: 0.882004	valid_1's rmse: 1.67256
+[30000]	training's rmse: 0.812746	valid_1's rmse: 1.66046
+[35000]	training's rmse: 0.753485	valid_1's rmse: 1.65166
+[40000]	training's rmse: 0.702617	valid_1's rmse: 1.6449
+[45000]	training's rmse: 0.658047	valid_1's rmse: 1.63946
+[50000]	training's rmse: 0.618099	valid_1's rmse: 1.63552
+[55000]	training's rmse: 0.582798	valid_1's rmse: 1.63251
+[60000]	training's rmse: 0.550334	valid_1's rmse: 1.62988
+[65000]	training's rmse: 0.52082	valid_1's rmse: 1.62734
+[70000]	training's rmse: 0.493752	valid_1's rmse: 1.62528
+[75000]	training's rmse: 0.468899	valid_1's rmse: 1.62387
+[80000]	training's rmse: 0.445931	valid_1's rmse: 1.6223
+[85000]	training's rmse: 0.424465	valid_1's rmse: 1.62114
+[90000]	training's rmse: 0.404486	valid_1's rmse: 1.62017
+[95000]	training's rmse: 0.385884	valid_1's rmse: 1.61928
+[100000]	training's rmse: 0.368825	valid_1's rmse: 1.61857
+[105000]	training's rmse: 0.352715	valid_1's rmse: 1.618
+[110000]	training's rmse: 0.337701	valid_1's rmse: 1.6175
+[115000]	training's rmse: 0.323382	valid_1's rmse: 1.61701
+[120000]	training's rmse: 0.310118	valid_1's rmse: 1.61679
+[125000]	training's rmse: 0.29756	valid_1's rmse: 1.61651
+[130000]	training's rmse: 0.285941	valid_1's rmse: 1.61624
+[135000]	training's rmse: 0.274973	valid_1's rmse: 1.61609
+[140000]	training's rmse: 0.264285	valid_1's rmse: 1.6159
+[145000]	training's rmse: 0.254267	valid_1's rmse: 1.61578
+[150000]	training's rmse: 0.244835	valid_1's rmse: 1.6157
+[155000]	training's rmse: 0.236006	valid_1's rmse: 1.61555
+[160000]	training's rmse: 0.22768	valid_1's rmse: 1.6155
+[165000]	training's rmse: 0.219603	valid_1's rmse: 1.61543
+[170000]	training's rmse: 0.211918	valid_1's rmse: 1.6153
+[175000]	training's rmse: 0.204655	valid_1's rmse: 1.61531
+[180000]	training's rmse: 0.197711	valid_1's rmse: 1.61524
+[185000]	training's rmse: 0.19102	valid_1's rmse: 1.61523
+[190000]	training's rmse: 0.184593	valid_1's rmse: 1.61523
+[195000]	training's rmse: 0.178645	valid_1's rmse: 1.6153
+[200000]	training's rmse: 0.172884	valid_1's rmse: 1.61528
+[205000]	training's rmse: 0.167403	valid_1's rmse: 1.61536
+Early stopping, best iteration is:
+[185419]	training's rmse: 0.190447	valid_1's rmse: 1.61521
+Fold 6
+Percentage null in valid: 0.23093922651933702
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.54301	valid_1's rmse: 1.81533
+[10000]	training's rmse: 1.24988	valid_1's rmse: 1.66692
+[15000]	training's rmse: 1.0915	valid_1's rmse: 1.61048
+[20000]	training's rmse: 0.97861	valid_1's rmse: 1.58017
+[25000]	training's rmse: 0.891536	valid_1's rmse: 1.56086
+[30000]	training's rmse: 0.821314	valid_1's rmse: 1.54692
+[35000]	training's rmse: 0.761266	valid_1's rmse: 1.53653
+[40000]	training's rmse: 0.709439	valid_1's rmse: 1.52878
+[45000]	training's rmse: 0.66385	valid_1's rmse: 1.52352
+[50000]	training's rmse: 0.622974	valid_1's rmse: 1.51877
+[55000]	training's rmse: 0.586673	valid_1's rmse: 1.51535
+[60000]	training's rmse: 0.553615	valid_1's rmse: 1.51273
+[65000]	training's rmse: 0.523299	valid_1's rmse: 1.51048
+[70000]	training's rmse: 0.495715	valid_1's rmse: 1.50867
+[75000]	training's rmse: 0.470268	valid_1's rmse: 1.50721
+[80000]	training's rmse: 0.446798	valid_1's rmse: 1.50616
+[85000]	training's rmse: 0.424931	valid_1's rmse: 1.50512
+[90000]	training's rmse: 0.404556	valid_1's rmse: 1.50423
+[95000]	training's rmse: 0.385766	valid_1's rmse: 1.50349
+[100000]	training's rmse: 0.368258	valid_1's rmse: 1.50326
+[105000]	training's rmse: 0.351974	valid_1's rmse: 1.50278
+[110000]	training's rmse: 0.336508	valid_1's rmse: 1.50251
+[115000]	training's rmse: 0.321776	valid_1's rmse: 1.50239
+[120000]	training's rmse: 0.308169	valid_1's rmse: 1.50219
+[125000]	training's rmse: 0.295426	valid_1's rmse: 1.50198
+[130000]	training's rmse: 0.283635	valid_1's rmse: 1.50193
+[135000]	training's rmse: 0.272431	valid_1's rmse: 1.502
+[140000]	training's rmse: 0.261682	valid_1's rmse: 1.50211
+[145000]	training's rmse: 0.251498	valid_1's rmse: 1.50226
+Early stopping, best iteration is:
+[129107]	training's rmse: 0.285689	valid_1's rmse: 1.50189
+Fold 7
+Percentage null in valid: 0.23093922651933702
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53389	valid_1's rmse: 1.90092
+[10000]	training's rmse: 1.24318	valid_1's rmse: 1.76409
+[15000]	training's rmse: 1.08628	valid_1's rmse: 1.71013
+[20000]	training's rmse: 0.973889	valid_1's rmse: 1.68096
+[25000]	training's rmse: 0.886753	valid_1's rmse: 1.66206
+[30000]	training's rmse: 0.816363	valid_1's rmse: 1.64933
+[35000]	training's rmse: 0.756462	valid_1's rmse: 1.64077
+[40000]	training's rmse: 0.704874	valid_1's rmse: 1.63396
+[45000]	training's rmse: 0.65956	valid_1's rmse: 1.62902
+[50000]	training's rmse: 0.619187	valid_1's rmse: 1.62499
+[55000]	training's rmse: 0.583124	valid_1's rmse: 1.62208
+[60000]	training's rmse: 0.55019	valid_1's rmse: 1.61978
+[65000]	training's rmse: 0.520046	valid_1's rmse: 1.61733
+[70000]	training's rmse: 0.492561	valid_1's rmse: 1.61535
+[75000]	training's rmse: 0.467401	valid_1's rmse: 1.61411
+[80000]	training's rmse: 0.444277	valid_1's rmse: 1.61308
+[85000]	training's rmse: 0.422607	valid_1's rmse: 1.61212
+[90000]	training's rmse: 0.402572	valid_1's rmse: 1.61142
+[95000]	training's rmse: 0.383965	valid_1's rmse: 1.61069
+[100000]	training's rmse: 0.366717	valid_1's rmse: 1.61027
+[105000]	training's rmse: 0.350611	valid_1's rmse: 1.61015
+[110000]	training's rmse: 0.335548	valid_1's rmse: 1.60978
+[115000]	training's rmse: 0.321151	valid_1's rmse: 1.60946
+[120000]	training's rmse: 0.307659	valid_1's rmse: 1.6092
+[125000]	training's rmse: 0.295162	valid_1's rmse: 1.60916
+[130000]	training's rmse: 0.283543	valid_1's rmse: 1.60909
+[135000]	training's rmse: 0.272524	valid_1's rmse: 1.60903
+[140000]	training's rmse: 0.261982	valid_1's rmse: 1.60918
+[145000]	training's rmse: 0.252022	valid_1's rmse: 1.60916
+[150000]	training's rmse: 0.242649	valid_1's rmse: 1.60921
+[155000]	training's rmse: 0.233937	valid_1's rmse: 1.60927
+Early stopping, best iteration is:
+[136342]	training's rmse: 0.26962	valid_1's rmse: 1.60899
+Fold 8
+Percentage null in valid: 0.23145071982281284
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53625	valid_1's rmse: 1.85859
+[10000]	training's rmse: 1.24068	valid_1's rmse: 1.71866
+[15000]	training's rmse: 1.08197	valid_1's rmse: 1.66566
+[20000]	training's rmse: 0.969767	valid_1's rmse: 1.63755
+[25000]	training's rmse: 0.883443	valid_1's rmse: 1.61964
+[30000]	training's rmse: 0.813733	valid_1's rmse: 1.60615
+[35000]	training's rmse: 0.754299	valid_1's rmse: 1.59704
+[40000]	training's rmse: 0.70314	valid_1's rmse: 1.58926
+[45000]	training's rmse: 0.658236	valid_1's rmse: 1.58311
+[50000]	training's rmse: 0.618056	valid_1's rmse: 1.57862
+[55000]	training's rmse: 0.582415	valid_1's rmse: 1.57505
+[60000]	training's rmse: 0.549889	valid_1's rmse: 1.57183
+[65000]	training's rmse: 0.520014	valid_1's rmse: 1.56951
+[70000]	training's rmse: 0.49277	valid_1's rmse: 1.56746
+[75000]	training's rmse: 0.467792	valid_1's rmse: 1.5656
+[80000]	training's rmse: 0.444714	valid_1's rmse: 1.5641
+[85000]	training's rmse: 0.423259	valid_1's rmse: 1.56293
+[90000]	training's rmse: 0.403183	valid_1's rmse: 1.5621
+[95000]	training's rmse: 0.384658	valid_1's rmse: 1.5613
+[100000]	training's rmse: 0.367421	valid_1's rmse: 1.56071
+[105000]	training's rmse: 0.351251	valid_1's rmse: 1.56016
+[110000]	training's rmse: 0.336088	valid_1's rmse: 1.55959
+[115000]	training's rmse: 0.321735	valid_1's rmse: 1.55928
+[120000]	training's rmse: 0.308307	valid_1's rmse: 1.55907
+[125000]	training's rmse: 0.295852	valid_1's rmse: 1.5587
+[130000]	training's rmse: 0.284152	valid_1's rmse: 1.5585
+[135000]	training's rmse: 0.273119	valid_1's rmse: 1.55837
+[140000]	training's rmse: 0.262384	valid_1's rmse: 1.55829
+[145000]	training's rmse: 0.252383	valid_1's rmse: 1.55833
+[150000]	training's rmse: 0.242964	valid_1's rmse: 1.55836
+[155000]	training's rmse: 0.234212	valid_1's rmse: 1.55835
+Early stopping, best iteration is:
+[139887]	training's rmse: 0.262626	valid_1's rmse: 1.55828
+Fold 9
+Percentage null in valid: 0.23145071982281284
+Percentage null in test: 0.18694096601073346
+Training until validation scores don't improve for 20000 rounds
+[5000]	training's rmse: 1.53873	valid_1's rmse: 1.82889
+[10000]	training's rmse: 1.2435	valid_1's rmse: 1.68383
+[15000]	training's rmse: 1.08462	valid_1's rmse: 1.6304
+[20000]	training's rmse: 0.971758	valid_1's rmse: 1.60206
+[25000]	training's rmse: 0.884747	valid_1's rmse: 1.58418
+[30000]	training's rmse: 0.81463	valid_1's rmse: 1.57244
+[35000]	training's rmse: 0.754996	valid_1's rmse: 1.56383
+[40000]	training's rmse: 0.70345	valid_1's rmse: 1.55704
+[45000]	training's rmse: 0.658228	valid_1's rmse: 1.55194
+[50000]	training's rmse: 0.617814	valid_1's rmse: 1.54782
+[55000]	training's rmse: 0.581891	valid_1's rmse: 1.54461
+[60000]	training's rmse: 0.549284	valid_1's rmse: 1.54193
+[65000]	training's rmse: 0.519545	valid_1's rmse: 1.53946
+[70000]	training's rmse: 0.492255	valid_1's rmse: 1.53798
+[75000]	training's rmse: 0.467254	valid_1's rmse: 1.53655
+[80000]	training's rmse: 0.444126	valid_1's rmse: 1.53538
+[85000]	training's rmse: 0.422613	valid_1's rmse: 1.53445
+[90000]	training's rmse: 0.402638	valid_1's rmse: 1.53388
+[95000]	training's rmse: 0.384028	valid_1's rmse: 1.53311
+[100000]	training's rmse: 0.366674	valid_1's rmse: 1.53275
+[105000]	training's rmse: 0.350544	valid_1's rmse: 1.53245
+[110000]	training's rmse: 0.335449	valid_1's rmse: 1.53229
+[115000]	training's rmse: 0.321026	valid_1's rmse: 1.53226
+[120000]	training's rmse: 0.307633	valid_1's rmse: 1.53222
+[125000]	training's rmse: 0.295056	valid_1's rmse: 1.53215
+[130000]	training's rmse: 0.283367	valid_1's rmse: 1.53211
+[135000]	training's rmse: 0.272178	valid_1's rmse: 1.53207
+[140000]	training's rmse: 0.261435	valid_1's rmse: 1.53223
+[145000]	training's rmse: 0.251325	valid_1's rmse: 1.53227
+[150000]	training's rmse: 0.241821	valid_1's rmse: 1.53251
+Early stopping, best iteration is:
+[134853]	training's rmse: 0.272497	valid_1's rmse: 1.53206
