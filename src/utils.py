@@ -80,3 +80,17 @@ def get_data(DATA_DIR):
     df.head(2)
 
     return df
+
+def print_rmse(df_train, oof):
+    folds = StratifiedKFold(n_splits=10, shuffle=True, random_state=99999)
+    val_fold_index_lists = [val for (train, val) in folds.split(df_train.values, df_train.label.values)]
+    folds_rmse = []
+    for val_idx in val_fold_index_lists:
+        numerator = (df_train.iloc[val_idx].label - oof[val_idx])**2
+        inner = numerator/(len(df_train.iloc[val_idx]))
+        fold_rmse = np.sqrt(inner.sum())
+        folds_rmse.append(fold_rmse)
+    mean_rmse = np.array(folds_rmse).mean()
+    std_rmse = np.array(folds_rmse).std()
+    print(f'Mean val RMSE {mean_rmse:.4f} +/- {std_rmse:.4f}' )
+    return mean_rmse, std_rmse
