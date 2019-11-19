@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import random
 import os
-
+from sklearn.model_selection import StratifiedKFold
 
 def plot_val_curve(train_scores, test_scores, param_range):
     """
@@ -94,3 +94,4 @@ def print_rmse(df_train, oof):
     std_rmse = np.array(folds_rmse).std()
     print(f'Mean val RMSE {mean_rmse:.4f} +/- {std_rmse:.4f}' )
     return mean_rmse, std_rmse
+

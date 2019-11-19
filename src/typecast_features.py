@@ -98,6 +98,7 @@ def typecast_features(df, cast_to_catcode=True):
         "num_album_per_min_artist": "int64",
         "num_album_per_min_composer": "int64",
         "freq_composer_min": "int64",
+        "title_cat":"category",
 
         # has some words with no special characters - in practice selects short and weird titles
     }

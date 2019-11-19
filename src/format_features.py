@@ -281,6 +281,7 @@ def format_features(df):
     df["composers_id_max_cat"] = df["composers_id_max_cat"].cat.codes
 
     df["num_same_title"] = df.groupby("title")["title"].transform("count")
+    df["title_cat"] = df["title"].astype('category')
     ##############
     # These use knowledge of entire dataset X values
     ##############
@@ -324,7 +325,9 @@ def format_features(df):
     df["num_album_per_min_composer"] = df.groupby(['composers_id_min', 'albumHashAndNameAndReleaseday'])['albumHashAndNameAndReleaseday'].transform('count').astype(
         'float')
 
-    df = df.drop(['album', 'album_hash'], axis = 1)
+    df = df.drop(['album_hash'], axis = 1)
+
+    df = remove_duplicate_songs_with_low_ranks(df) # recommended by zalo
 
     return df
 
@@ -504,4 +507,15 @@ def assign_artist_features_inplace(df):
     df['artist_std_id'] = df['artist_std_id'].astype("category")
     df['artist_count_id'] = df['artist_count_id'].astype("category")
 
+    return df
+
+def remove_duplicate_songs_with_low_ranks(df):
+    duplicateRowsDF = df[df.duplicated(["title", "album", "artist_name"], False)]
+    duplicateRowsDF = duplicateRowsDF[~duplicateRowsDF.label.isnull()]
+    all_index = duplicateRowsDF.index
+    duplicateRowsDF= duplicateRowsDF.sort_values(by=['label'])
+    duplicateRowsDF = duplicateRowsDF.drop_duplicates(["title", "album", "artist_name"],keep="first")
+    keep_index = duplicateRowsDF.index
+    remove_index = list(set(all_index) - set(keep_index))
+    df = df.drop(remove_index)
     return df
