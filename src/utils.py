@@ -95,3 +95,42 @@ def print_rmse(df_train, oof):
     print(f'Mean val RMSE {mean_rmse:.4f} +/- {std_rmse:.4f}' )
     return mean_rmse, std_rmse
 
+def findSimilarExamples():
+    from sklearn.neighbors import NearestNeighbors
+    from sklearn.cluster import KMeans
+    import numpy as np
+
+    def remove_duplicate_songs_with_low_ranks(df):
+        '''Based on Zalo Discussion - competition organisers said please remove low rank duplicate data as it noise'''
+        duplicateRowsDF = df[df.duplicated(["title", "album", "artist_name"], False)]
+        duplicateRowsDF = duplicateRowsDF[~duplicateRowsDF.label.isnull()]
+        all_index = duplicateRowsDF.index
+        duplicateRowsDF = duplicateRowsDF.sort_values(by=['label'])
+        duplicateRowsDF = duplicateRowsDF.drop_duplicates(["title", "album", "artist_name"], keep="first")
+        keep_index = duplicateRowsDF.index
+        remove_index = list(set(all_index) - set(keep_index))
+        df = df.drop(remove_index)
+        return df
+
+    chosen_features = ["album_right", "istrack11", "no_artist", "no_composer", "freq_artist", "freq_composer", "year",
+                       "month", "hour", "day", "len_of_songname",
+                       "isRemix", "isOST", "isBeat", "isVersion", "isCover", "num_song_release_in_final_month",
+                       "length", "genre", "track", "album_artist", "islyric", "album_artist_contain_artistname",
+                       "len_album_name", "isRemixAlbum", "isOSTAlbum", "isSingleAlbum", "album_name_is_title_name",
+                       "isBeatAlbum", "isCoverAlbum", "artist_name", "composers_name", "copyright",
+                       "artist_id_min_cat", "composers_id_min_cat", "artist_id_max_cat", "composers_id_max_cat",
+                       "freq_artist_min", "freq_composer_min", "dayofyear", "weekday", "isHoliday",
+                       "num_album_per_min_artist", "num_album_per_min_composer",
+                       "numsongInAlbum", "isSingleAlbum_onesong", "artist_mean_id",
+                       "artist_std_id", "artist_count_id", "title_truncated", "num_same_title"]
+
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(df[chosen_features])
+    distances, indices = nbrs.kneighbors(df[chosen_features])
+    df_train = df[df.dataset == "train"]
+    df_train = df_train[(df_train.length > 0) | (df_train.num_same_title == 1)]  # filter out duplicates from train
+    df_train = remove_duplicate_songs_with_low_ranks(df_train)
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='auto').fit(df_train[chosen_features])
+    distances_train, indices_train = nbrs.kneighbors(df_train[chosen_features])
+    DISTANCE_THRESHOLD = 0.4
+    indices_train[distances_train[:, 1] < DISTANCE_THRESHOLD]  # loc pairs within this distance
+    df_train.loc[7484:7485] # show these examples
