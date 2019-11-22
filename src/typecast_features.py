@@ -89,7 +89,7 @@ def typecast_features(df, cast_to_catcode=True):
         ###########################
         # Warning: the below features those that require "global" knowledge beyond that example
         ###########################
-        "numsongInAlbum": "category",
+        "numsongInAlbum": "int64",
         "isSingleAlbum_onesong": "bool",
         # "num_song_released_that_week":'int64',
         "num_song_release_in_final_month": "int64",
