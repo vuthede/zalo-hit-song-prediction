@@ -1,21 +1,3 @@
-short_categoricals = ['genre',
- 'album_name_is_title_name',
- 'year',
- 'copyright',
- 'artist_name',
- 'isHoliday',
- 'album_artist_contain_artistname',
- 'day',
- 'numsongInAlbum',
- 'month',
- 'weekday',
- 'hour']
-
-
-
-import sys
-sys.path.insert(0, '/media/DATA/zalo-hit-song-prediction/src/')
-
 import pandas as pd
 import numpy as np
 import random
@@ -30,17 +12,26 @@ from math import sqrt
 from sklearn.externals import joblib
 import pandas as pd
 from format_features import baysianEncodeFeature
-from utils import print_data_types
-from utils import get_data
 from format_features import format_features, assign_artist_features_inplace
 from typecast_features import typecast_features
+from sklearn.externals import joblib
+import sys
+sys.path.insert(0, '../')
+from utils import print_data_types
+from utils import get_data, print_rmse
 
 np.random.seed(1)
 random.seed(1)
-DATA_DIR = "/media/DATA/zalo-hit-song-prediction/csv/"
+DATA_DIR="../../csv/"
 df = get_data(DATA_DIR)
 df = format_features(df)
 all_features_in_order_list, df = typecast_features(df, cast_to_catcode=True)
+
+print("Len before: ",len(df) )
+# Remove len =0
+df = df[(df.length>0) | (df.num_same_title==1)]
+
+print("Len after: ",len(df) )
 df = assign_artist_features_inplace(df)
 
 ###
@@ -62,7 +53,7 @@ chosen_features = ["album_right", "istrack11", "no_artist", "no_composer", "freq
                    "freq_artist_min", "freq_composer_min", "dayofyear", "weekday", "isHoliday",
                    "num_album_per_min_artist", "num_album_per_min_composer",
                    "numsongInAlbum", "isSingleAlbum_onesong", "artist_mean_id",
-                   "artist_std_id", "artist_count_id", "title_truncated", "num_same_title"]
+                   "artist_std_id", "artist_count_id", "title_cat", "num_same_title"]
 
 chosen_features += ["predicted_label"]
 # chosen_features += ["mean_album_score", "mean_artist_min_score"]
@@ -99,8 +90,8 @@ for fold_, (trn_idx, val_idx) in enumerate(folds.split(df_train.values, df_train
                                   df_test.iterrows()]
     print("Percentage null in test:", len(np.sum(df_test.isnull())) / len(df_test))
 
-    trn_data = lgb.Dataset(df_train.iloc[trn_idx][chosen_features], label=labels.iloc[trn_idx])
-    val_data = lgb.Dataset(df_train.iloc[val_idx][chosen_features], label=labels.iloc[val_idx])
+    trn_data = lgb.Dataset(df_train.iloc[trn_idx][chosen_features], label=labels.iloc[trn_idx],params={'verbose': -1}, free_raw_data=False)
+    val_data = lgb.Dataset(df_train.iloc[val_idx][chosen_features], label=labels.iloc[val_idx],params={'verbose': -1}, free_raw_data=False)
     clf = lgb.train(param, trn_data, 1000000, valid_sets=[trn_data, val_data], verbose_eval=5000,
                     early_stopping_rounds=20000)
     oof[val_idx] = clf.predict(df_train.iloc[val_idx][chosen_features], num_iteration=clf.best_iteration)
@@ -112,4 +103,4 @@ print("RMSE: {:<8.5f}".format(sqrt(mean_squared_error(df_train.label, oof))))
 sub = pd.DataFrame({"ID": df_test.ID.values})
 sub["label"] = predictions.round(decimals=4)
 mean_rmse, std_rmse = print_rmse(df_train, oof)
-sub.to_csv(f"baseline2_album_right_titletruncated_{mean_rmse:.4f}_{std_rmse:.4f}_rep.csv", index=False, header=False)
+sub.to_csv(f"baseline3_{mean_rmse:.4f}_{std_rmse:.4f}.csv", index=False, header=False)
