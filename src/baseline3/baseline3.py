@@ -1,21 +1,3 @@
-short_categoricals = ['genre',
- 'album_name_is_title_name',
- 'year',
- 'copyright',
- 'artist_name',
- 'isHoliday',
- 'album_artist_contain_artistname',
- 'day',
- 'numsongInAlbum',
- 'month',
- 'weekday',
- 'hour']
-
-
-
-import sys
-sys.path.insert(0, '/media/DATA/zalo-hit-song-prediction/src/')
-
 import pandas as pd
 import numpy as np
 import random
@@ -30,15 +12,17 @@ from math import sqrt
 from sklearn.externals import joblib
 import pandas as pd
 from format_features import baysianEncodeFeature
-from utils import print_data_types
-from utils import get_data, print_rmse
 from format_features import format_features, assign_artist_features_inplace
 from typecast_features import typecast_features
+from sklearn.externals import joblib
+import sys
+sys.path.insert(0, '../')
+from utils import print_data_types
+from utils import get_data, print_rmse
 
 np.random.seed(1)
 random.seed(1)
-# DATA_DIR = "/media/DATA/zalo-hit-song-prediction/csv/"
-DATA_DIR="/home/vuthede/AI/zalo/zalo-hit-song-prediction/csv/"
+DATA_DIR="../../csv/"
 df = get_data(DATA_DIR)
 df = format_features(df)
 all_features_in_order_list, df = typecast_features(df, cast_to_catcode=True)
@@ -49,8 +33,6 @@ df = df[(df.length>0) | (df.num_same_title==1)]
 
 print("Len after: ",len(df) )
 df = assign_artist_features_inplace(df)
-
-
 
 ###
 import lightgbm as lgb
@@ -121,4 +103,4 @@ print("RMSE: {:<8.5f}".format(sqrt(mean_squared_error(df_train.label, oof))))
 sub = pd.DataFrame({"ID": df_test.ID.values})
 sub["label"] = predictions.round(decimals=4)
 mean_rmse, std_rmse = print_rmse(df_train, oof)
-sub.to_csv(f"baseline2_album_right_titletruncated_{mean_rmse:.4f}_{std_rmse:.4f}_rep.csv", index=False, header=False)
+sub.to_csv(f"baseline3_{mean_rmse:.4f}_{std_rmse:.4f}.csv", index=False, header=False)
