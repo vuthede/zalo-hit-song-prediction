@@ -286,7 +286,7 @@ def format_features(df):
     # These use knowledge of entire dataset X values
     ##############
 
-    df["numsongInAlbum"] = df.groupby("albumHashAndNameAndReleaseday")["albumHashAndNameAndReleaseday"].transform("count")
+    df["numsongInAlbum"] = df.groupby("album_right")["album_right"].transform("count")
     df["isSingleAlbum_onesong"] = df["isSingleAlbum"] & (df["numsongInAlbum"] == 1)
 
     '''
@@ -320,9 +320,9 @@ def format_features(df):
     df["freq_artist_min"] = df.groupby('_artist_id_min_cat')['_artist_id_min_cat'].transform('count').astype('float')
     df["freq_composer_min"] = df.groupby('_composers_id_min_cat')['_composers_id_min_cat'].transform('count').astype(
         'float')
-    df["num_album_per_min_artist"] = df.groupby(['_artist_id_min_cat', 'albumHashAndNameAndReleaseday'])['albumHashAndNameAndReleaseday'].transform('count').astype(
+    df["num_album_per_min_artist"] = df.groupby(['_artist_id_min_cat', 'album_right'])['album_right'].transform('count').astype(
         'float')
-    df["num_album_per_min_composer"] = df.groupby(['composers_id_min', 'albumHashAndNameAndReleaseday'])['albumHashAndNameAndReleaseday'].transform('count').astype(
+    df["num_album_per_min_composer"] = df.groupby(['composers_id_min', 'album_right'])['album_right'].transform('count').astype(
         'float')
 
     df = df.drop(['album_hash'], axis = 1)
@@ -357,29 +357,6 @@ def baysianEncodeFeature(df_train, trn_idx, featurename, prior_weight, fillmissi
 from functools import reduce
 
 
-def create_album_score_lookup_table(df):
-    data = df.groupby('album_right').label.agg(["mean", "std", "count"])
-    return data
-
-
-def create_artist_score_lookup_table(df):
-    def split_id(s):
-        return re.split(',|\.', s)
-
-    def mask_row_contain_artist_id(df, artist_id):
-        r = df.artist_id.apply(lambda x: artist_id in split_id(x))
-        return r
-
-    # Get all artist ids
-    artist_group = df.artist_id.unique()
-    artist_ids = reduce(lambda l, e: l + split_id(e), artist_group, [])
-    artist_ids = list(set(artist_ids))
-    # Get data
-    data = [df[mask_row_contain_artist_id(df, artist_id)].label.agg(["mean", "std", "count", "median"])
-            for artist_id in artist_ids]
-    new_df = pd.DataFrame(data=data)
-    new_df["artist_id"] = artist_ids
-    return new_df.set_index("artist_id")
 
 
 def create_album_score_lookup_table(df):
@@ -402,8 +379,8 @@ def create_artist_score_lookup_table(df):
     data = [df[mask_row_contain_artist_id(df, artist_id)].label.agg(["mean", "std", "count", "median"])
             for artist_id in artist_ids]
     new_df = pd.DataFrame(data=data)
-    new_df["artist_id"] = artist_ids
-    return new_df.set_index("artist_id")
+    new_df["artist_mean_id"] = artist_ids
+    return new_df.set_index("artist_mean_id")
 
 def get_field_by_key(table, k, field="mean"):
     if k in table.index:
@@ -417,7 +394,7 @@ def get_value_by_key(table, k):
 
 def assign_value(album_table, artist_table, r):
     d1, isnul1 = get_value_by_key(album_table, r.album_right)
-    d2, isnul2 = get_value_by_key(artist_table, r.artist_id_min_cat)
+    d2, isnul2 = get_value_by_key(artist_table, r.artist_mean_id)
     #     print(type(d2),isnul2)
     if isnul1 and isnul2:
         return np.nan
