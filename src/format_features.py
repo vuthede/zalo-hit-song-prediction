@@ -359,10 +359,7 @@ from functools import reduce
 
 
 
-def create_album_score_lookup_table(df):
-    data = df.groupby('album_right').label.agg(["mean", "std", "count"])
-    return data
-
+'''
 def create_artist_score_lookup_table(df):
     def split_id(s):
         return re.split(',|\.', s)
@@ -373,6 +370,8 @@ def create_artist_score_lookup_table(df):
 
     # Get all artist ids
     artist_group = df.artist_id.unique()
+
+    # Make a flattened list of all unique ids == flattened([split_id(artists) for artists in artist_group])
     artist_ids = reduce(lambda l, e: l + split_id(e), artist_group, [])
     artist_ids = list(set(artist_ids))
     # Get data
@@ -381,16 +380,8 @@ def create_artist_score_lookup_table(df):
     new_df = pd.DataFrame(data=data)
     new_df["artist_mean_id"] = artist_ids
     return new_df.set_index("artist_mean_id")
+    
 
-def get_field_by_key(table, k, field="mean"):
-    if k in table.index:
-        return table.loc[k][field]
-    return np.nan
-
-def get_value_by_key(table, k):
-    if k in table.index:
-        return table.loc[k], False
-    return np.nan, True
 
 def assign_value(album_table, artist_table, r):
     d1, isnul1 = get_value_by_key(album_table, r.album_right)
@@ -407,6 +398,69 @@ def assign_value(album_table, artist_table, r):
         return d1["mean"]
 
     return np.nan
+'''
+
+
+def get_value_by_key(table, k):
+    # given a dictionary indexed by mean/std/count containing a dictionary indexed by id
+    # If in album, return it's value, False.
+    # Else return np.nan and True to represent unavailable
+    if k in table.index:
+        return table.loc[k], False
+    return np.nan, True
+
+def assign_value_redesigned(album_table, artist_table, row):
+    '''
+    album_table: a dataframe indexed by album id with mean/std/count columns
+    artist_table: a dataframe indexed by string artist id (our 'best' artist foe the song if many)
+    row: Given a row of the full dataset with features album_right (The album ID based on release tieme)
+    and artist_mean_id (The best scoring ID amongst artists for that song)
+    '''
+    album_rank_stats, album_not_found = get_value_by_key(album_table, row.album_right)
+    artist_rank_stats, artist_not_found = get_value_by_key(artist_table, row.artist_mean_id)
+
+    if not album_not_found:
+        trust_album = album_rank_stats["std"] < 2
+    else:
+        trust_album = False # can't trust an album we have no training data on so set to False
+
+    if not artist_not_found:
+        trust_artist = artist_rank_stats["std"] < 2 # false if low or nan std
+    else:
+        trust_album = False # can't trust an artist we have no training data on so set to False
+
+    if album_not_found and artist_not_found:
+        return np.nan
+
+    elif (not album_not_found) and (not artist_not_found):
+        # if both are present
+        if trust_artist and trust_album:
+            assert artist_rank_stats['count'] >= 1
+            assert album_rank_stats['count'] >= 1
+            return (artist_rank_stats['count'] * artist_rank_stats['mean'] + album_rank_stats['count'] * album_rank_stats['mean']) / (artist_rank_stats['count'] + album_rank_stats['count'])
+        elif trust_artist:
+            return artist_rank_stats["mean"]
+        elif trust_album:
+            return album_rank_stats["mean"]
+        else:
+            return np.nan
+
+    elif album_not_found:
+        if trust_artist:
+            assert not np.isnan(artist_rank_stats["mean"])
+            return artist_rank_stats["mean"]
+        else:
+            return np.nan
+
+    elif artist_not_found:
+        if trust_album:
+            assert not np.isnan(album_rank_stats["mean"])
+            return album_rank_stats["mean"]
+        else:
+            return np.nan
+    else:
+        return np.nan
+
 
 def assign_artist_features_inplace(df):
     def split_id(s):
@@ -494,7 +548,13 @@ def assign_artist_features_inplace(df):
     df['artist_std_id'] = df['artist_std_id'].astype("category")
     df['artist_count_id'] = df['artist_count_id'].astype("category")
 
-    return df
+    artist_score_lookup_table = new_df
+    return df, artist_score_lookup_table
+
+
+def create_album_score_lookup_table(df):
+    data = df.groupby('album_right').label.agg(["mean", "std", "count"])
+    return data
 
 def remove_duplicate_songs_with_low_ranks(df):
     duplicateRowsDF = df[df.duplicated(["title", "album", "artist_name"], False)]
