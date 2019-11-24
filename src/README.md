@@ -1,4 +1,7 @@
  
+# Generate metadata features
+python3 create_metadata_features.py  --in_mp3_dirs /data/zalo/hit-song-prediction/train   /data/zalo/hit-song-prediction/test --out_csv_metadata_path metadata.csv
+
 # Example Usage
 ```
 %load_ext autoreload
