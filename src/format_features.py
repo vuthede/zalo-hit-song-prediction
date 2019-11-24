@@ -409,7 +409,6 @@ def assign_value(album_table, artist_table, r):
     return np.nan
 
 def assign_artist_features_inplace(df):
-
     def split_id(s):
         return re.split(',|\.', s)
 
@@ -420,66 +419,77 @@ def assign_artist_features_inplace(df):
         for i in ps:
             idx_lst.append(i)
 
+    # id_lst is a list of all unique artist names  IN THE DATASET , as strings
     id_lst = list(set(idx_lst))
 
-    def condition(df, artist_id):
-        r = df.artist_id.apply(lambda x: artist_id in split_id(x))
+    def condition(inner_df, unique_artist_id):
+        # Returns Series of True/False for each row of inner_df whether the artist_id field is in inner_df.
+        r = inner_df.artist_id.apply(lambda x: unique_artist_id in split_id(x))
         return r
 
     df_train = df[df.dataset == "train"]
-    data = [df_train[condition(df_train, artist_id)].label.agg(["mean", "std", "count"]) for artist_id in id_lst]
+    data = [df_train[condition(df_train, unique_artist_id)].label.agg(["mean", "std", "count"]) for unique_artist_id in id_lst]
+    # Note that SOME test data will have mean = NaN, std = Nan and count = 0.0 e.g. ,str(646400)
+    # Single examples will have mean = variable, std = Nan and count = 1
     new_df = pd.DataFrame(data=data)
     new_df["artist_id"] = id_lst
 
-    new_df.dropna(inplace=True)
     new_df.set_index('artist_id', inplace=True)
+
+    # ONLY VALUES IN THE TRAINING SET in this but KEYS of all dataframe (train/test)
+    # art_dict is a dict indexed by count/mean/std which returns dictionary indiexes by artist id string
     art_dict = new_df.to_dict()
 
+    import math
+    import sys
+
     def best_count_id(values):
+        # Iterate over the artists of THIS song, choosing the id which results in highest count
+        # If none of the artists can be mapped to training data, the resulting temp_id will be nan
         ids = split_id(values)
-        temp_mean = 0
-        temp_id = str(min([int(a) for a in ids]))
+        temp_count = 0
         for id in ids:
-            try:
-                if art_dict['count'][id] > temp_mean:
-                    temp_mean = art_dict['count'][id]
-                    temp_id = id
-            except:
-                temp_mean = temp_mean
-                temp_id = temp_id
+            if art_dict['count'][id] > temp_count:
+                temp_count = art_dict['count'][id]
+                temp_id = id
+        if art_dict['count'][id] == 0:
+            temp_id = np.nan
+
         return temp_id
 
     def best_mean_id(values):
+        # Iterate over the artists for those of THIS song, choosing the id which results in highest mean rank
+        # If none of the artists can be mapped to training data, the resulting temp_id will be nan
         ids = split_id(values)
-        temp_mean = 10
-        temp_id = str(min([int(a) for a in ids]))
+        temp_mean = sys.maxsize
         for id in ids:
-            try:
-                if art_dict['mean'][id] < temp_mean:
-                    temp_mean = art_dict['mean'][id]
-                    temp_id = id
-            except:
-                temp_mean = temp_mean
-                temp_id = temp_id
+            if art_dict['mean'][id] < temp_mean:
+                temp_mean = art_dict['mean'][id]
+                temp_id = id
+        if math.isnan(art_dict['mean'][id]):
+            temp_id = np.nan
         return temp_id
 
     def best_std_id(values):
+        # Iterate over the artists for those of THIS song, choosing the id which results in lowest std
+        # If none of the artists can be mapped to training data, the resulting temp_id will be nan
         ids = split_id(values)
-        temp_std = 10
+        temp_std = sys.maxsize
         temp_id = str(min([int(a) for a in ids]))
         for id in ids:
-            try:
-                if art_dict['std'][id] < temp_std:
-                    temp_std = art_dict['std'][id]
-                    temp_id = id
-            except:
-                temp_std = temp_std
-                temp_id = temp_id
+            if art_dict['std'][id] < temp_std:
+                temp_std = art_dict['std'][id]
+                temp_id = id
+        if math.isnan(art_dict['std'][id]):
+            temp_id = np.nan
         return temp_id
 
     df['artist_count_id'] = df['artist_id'].apply(best_count_id)
+    print("Missing artist_count_id", df['artist_count_id'].isnull().sum())
     df['artist_mean_id'] = df['artist_id'].apply(best_mean_id)
+    print("Missing artist_mean_id", df['artist_mean_id'].isnull().sum())
     df['artist_std_id'] = df['artist_id'].apply(best_std_id)
+    print("Missing artist_std_id", df['artist_std_id'].isnull().sum())
     df['artist_mean_id'] = df['artist_mean_id'].astype("category")
     df['artist_std_id'] = df['artist_std_id'].astype("category")
     df['artist_count_id'] = df['artist_count_id'].astype("category")

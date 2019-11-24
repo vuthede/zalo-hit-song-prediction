@@ -10,6 +10,26 @@ import numpy as np
 import random
 import os
 from sklearn.model_selection import StratifiedKFold
+from impyute.imputation.cs import fast_knn
+import sys
+
+
+def impute_missing_values_by_knn(df_chosen_features, k=5):
+    '''Provide a pandas df of all chosen features including those with no mising values.
+       Will fill in the missing values - preserving original dtypes of columns'''
+    from impyute.imputation.cs import fast_knn
+    import sys
+    sys.setrecursionlimit(100000)  # Increase the recursion limit of the OS
+    col_names = df_chosen_features.columns
+    # Inpute missing values using KNN --> note that float64 dtype temporarily required
+    orig_feature_types = [df_chosen_features[colname].dtype for colname in col_names]
+    imputed_training_values = fast_knn(df_chosen_features.astype('float64').values, k)
+    df_chosen_features.loc[:,:] = imputed_training_values
+    # Restore original dtypes
+    for colname, type_string in zip(col_names, orig_feature_types):
+        df_chosen_features[colname] = df_chosen_features[colname].astype(type_string)
+    return df_chosen_features
+
 
 def plot_val_curve(train_scores, test_scores, param_range):
     """
@@ -134,3 +154,4 @@ def findSimilarExamples():
     DISTANCE_THRESHOLD = 0.4
     indices_train[distances_train[:, 1] < DISTANCE_THRESHOLD]  # loc pairs within this distance
     df_train.loc[7484:7485] # show these examples
+
