@@ -356,10 +356,32 @@ def baysianEncodeFeature(df_train, trn_idx, featurename, prior_weight, fillmissi
 
 from functools import reduce
 
+
+
+
 '''
 def create_artist_score_lookup_table(df):
-   # no need for this --> use return value of assign_artist_features_inplace
-   pass
+    def split_id(s):
+        return re.split(',|\.', s)
+
+    def mask_row_contain_artist_id(df, artist_id):
+        r = df.artist_id.apply(lambda x: artist_id in split_id(x))
+        return r
+
+    # Get all artist ids
+    artist_group = df.artist_id.unique()
+
+    # Make a flattened list of all unique ids == flattened([split_id(artists) for artists in artist_group])
+    artist_ids = reduce(lambda l, e: l + split_id(e), artist_group, [])
+    artist_ids = list(set(artist_ids))
+    # Get data
+    data = [df[mask_row_contain_artist_id(df, artist_id)].label.agg(["mean", "std", "count", "median"])
+            for artist_id in artist_ids]
+    new_df = pd.DataFrame(data=data)
+    new_df["artist_mean_id"] = artist_ids
+    return new_df.set_index("artist_mean_id")
+    
+
 
 def assign_value(album_table, artist_table, r):
     d1, isnul1 = get_value_by_key(album_table, r.album_right)
@@ -377,6 +399,7 @@ def assign_value(album_table, artist_table, r):
 
     return np.nan
 '''
+
 
 def get_value_by_key(table, k):
     # given a dictionary indexed by mean/std/count containing a dictionary indexed by id
