@@ -25,33 +25,15 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline, FeatureUnion, make_union
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import HashingVectorizer
+from utils import get_data
 
 def rmse(targets, predictions):
     return np.sqrt(mean_squared_error(targets, predictions))
 np.random.seed(1)
 random.seed(1)
 
-TRAININFO = "/media/DATA/zalo-hit-song-prediction/csv/train_info.tsv"
-TRAINRANK =  "/media/DATA/zalo-hit-song-prediction/csv/train_rank.csv"
-TESTINFO = "/media/DATA/zalo-hit-song-prediction/csv/test_info.tsv"
-Track_info = "/media/DATA/zalo-hit-song-prediction/csv/all_track_info.csv"
-Audio_info = "/media/DATA/zalo-hit-song-prediction/csv/all_track_audio_features.csv"
-df_i = pd.read_csv(TRAININFO, delimiter='\t',encoding='utf-8')
-df_r = pd.read_csv(TRAINRANK)
-df_i_train = df_i.merge(df_r, left_on='ID', right_on='ID')
-df_i_train["dataset"] = "train"
-
-df_i_test = pd.read_csv(TESTINFO, delimiter='\t',encoding='utf-8')
-df_i_test["label"] = np.nan
-df_i_test["dataset"] = "test"
-
-df = pd.concat([df_i_train, df_i_test])
-df_track_info = pd.read_csv(Track_info)
-df = df.merge(df_track_info, left_on='ID', right_on='ID')
-df_audio_features = pd.read_csv(Audio_info)
-df =df.merge(df_audio_features,left_on="ID",right_on="ID", how="left")
+df = get_data("../csv/")
 df = df[['ID','title','artist_name','lyric','label','dataset']]
-df.head()
 '''
 def encode_column(df, column_name, to_n_columns=12):
 
@@ -167,7 +149,12 @@ print(gs_clf.best_score_, gs_clf.best_params_)
 pd.DataFrame(gs_clf.cv_results_).to_csv('svr_lyric_bigram2.csv')
 '''
 model_pipeline.fit(df_train, df_train.label)
-joblib.dump(model2, 'svr_lyric_bigram2_trained_on_whole_set.pkl')
-preds = model_pipeline.predict(df_train)
-df_train['lyric_feature'] = preds
-df_train[['ID', 'lyric_feature']].to_csv('../csv/lyric_feature.csv')
+joblib.dump(model_pipeline, '../src/svr_lyric_bigram2_trained_on_whole_set.pkl')
+
+#### Reload all raw data (i.e. without dropped duplicate lyrics!)
+df = get_data("../csv/")
+tmp = joblib.load('svr_lyric_bigram2_trained_on_whole_set.pkl')
+df.dropna(subset=['lyric'], inplace=True)
+df_pred = tmp.predict(df)
+df['lyric_feature'] = df_pred
+df[['ID', 'lyric_feature']].to_csv('../csv/lyric_feature.csv')
