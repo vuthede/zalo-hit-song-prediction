@@ -357,10 +357,6 @@ def baysianEncodeFeature(df_train, trn_idx, featurename, prior_weight, fillmissi
 from functools import reduce
 
 '''
-def create_artist_score_lookup_table(df):
-   # no need for this --> use return value of assign_artist_features_inplace
-   pass
-
 def assign_value(album_table, artist_table, r):
     d1, isnul1 = get_value_by_key(album_table, r.album_right)
     d2, isnul2 = get_value_by_key(artist_table, r.artist_mean_id)
@@ -377,6 +373,35 @@ def assign_value(album_table, artist_table, r):
 
     return np.nan
 '''
+
+def create_artist_score_lookup_table(df):
+    def split_id(s):
+        return re.split(',|\.', s)
+
+    m = df.artist_id.unique()
+    idx_lst = []
+    for idx in m:
+        ps = split_id(idx)
+        for i in ps:
+            idx_lst.append(i)
+
+    # id_lst is a list of all unique artist names  IN THE DATASET , as strings
+    id_lst = list(set(idx_lst))
+
+    def condition(inner_df, unique_artist_id):
+        # Returns Series of True/False for each row of inner_df whether the artist_id field is in inner_df.
+        r = inner_df.artist_id.apply(lambda x: unique_artist_id in split_id(x))
+        return r
+
+    df_train = df[df.dataset == "train"]
+    data = [df_train[condition(df_train, unique_artist_id)].label.agg(["mean", "std", "count"]) for unique_artist_id in id_lst]
+    # Note that SOME test data will have mean = NaN, std = Nan and count = 0.0 e.g. ,str(646400)
+    # Single examples will have mean = variable, std = Nan and count = 1
+    new_df = pd.DataFrame(data=data)
+    new_df["artist_id"] = id_lst
+    new_df.set_index('artist_id', inplace=True)
+    artist_score_lookup_table = new_df
+    return artist_score_lookup_table
 
 def get_value_by_key(table, k):
     # given a dictionary indexed by mean/std/count containing a dictionary indexed by id
@@ -404,7 +429,7 @@ def assign_value_redesigned(album_table, artist_table, row):
     if not artist_not_found:
         trust_artist = artist_rank_stats["std"] < 2 # false if low or nan std
     else:
-        trust_album = False # can't trust an artist we have no training data on so set to False
+        trust_artist = False # can't trust an artist we have no training data on so set to False
 
     if album_not_found and artist_not_found:
         return np.nan
@@ -464,7 +489,6 @@ def assign_artist_features_inplace(df):
     # Single examples will have mean = variable, std = Nan and count = 1
     new_df = pd.DataFrame(data=data)
     new_df["artist_id"] = id_lst
-
     new_df.set_index('artist_id', inplace=True)
 
     # ONLY VALUES IN THE TRAINING SET in this but KEYS of all dataframe (train/test)
@@ -525,8 +549,7 @@ def assign_artist_features_inplace(df):
     df['artist_std_id'] = df['artist_std_id'].astype("category")
     df['artist_count_id'] = df['artist_count_id'].astype("category")
 
-    artist_score_lookup_table = new_df
-    return df, artist_score_lookup_table
+    return df
 
 
 def create_album_score_lookup_table(df):
