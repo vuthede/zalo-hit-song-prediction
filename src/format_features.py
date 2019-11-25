@@ -356,7 +356,7 @@ def baysianEncodeFeature(df_train, trn_idx, featurename, prior_weight, fillmissi
 
 from functools import reduce
 
-'''
+
 def assign_value(album_table, artist_table, r):
     d1, isnul1 = get_value_by_key(album_table, r.album_right)
     d2, isnul2 = get_value_by_key(artist_table, r.artist_mean_id)
@@ -372,7 +372,7 @@ def assign_value(album_table, artist_table, r):
         return d1["mean"]
 
     return np.nan
-'''
+
 
 def create_artist_score_lookup_table(df):
     def split_id(s):

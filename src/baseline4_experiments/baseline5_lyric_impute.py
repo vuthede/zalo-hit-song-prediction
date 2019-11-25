@@ -19,7 +19,6 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import sys
-from sklearn.utils import compute_sample_weight
 sys.path.insert(0, "../")
 from format_features import create_album_score_lookup_table, create_artist_score_lookup_table, assign_value_redesigned
 from typecast_features import cast_cat_dtype_to_cat_codes
@@ -28,11 +27,14 @@ from format_features import format_features, assign_artist_features_inplace
 from typecast_features import typecast_features
 from utils import print_data_types
 from utils import get_data, print_rmse
+from utils import impute_missing_values_by_knn
 
 np.random.seed(1)
 random.seed(1)
 DATA_DIR="../../csv/"
 df = get_data(DATA_DIR)
+df_lyric = pd.read_csv(os.path.join(DATA_DIR, "lyric_feature.csv"))
+df = df.merge(df_lyric, left_on="ID", right_on="ID", how="left")
 df = format_features(df)
 all_features_in_order_list, df = typecast_features(df, cast_to_catcode=True)
 
@@ -57,7 +59,7 @@ chosen_features = ["album_right", "istrack11", "no_artist", "no_composer", "freq
                    "numsongInAlbum", "isSingleAlbum_onesong", "artist_mean_id",
                    "artist_std_id", "artist_count_id", "title_cat", "num_same_title"]
 
-chosen_features += ["predicted_label"]
+chosen_features += ["predicted_label", "lyric_feature"]
 # chosen_features += ["mean_album_score", "mean_artist_min_score"]
 df_train = df[df.dataset == "train"]
 df_test = df[df.dataset == "test"]
@@ -82,7 +84,7 @@ oof = np.zeros(len(df_train))
 predictions = np.zeros(len(df_test))
 labels = df_train.label
 best_stopping_iterations_list = []
-for fold_, (trn_idx, val_idx) in enumerate(folds.split(df_train.values, df_train.album_right.values)):
+for fold_, (trn_idx, val_idx) in enumerate(folds.split(df_train.values, df_train.label.values)):
     print("Fold {}".format(fold_))
     # Create lookup table
     album_lookup_table = create_album_score_lookup_table(df_train.iloc[trn_idx])
@@ -91,20 +93,26 @@ for fold_, (trn_idx, val_idx) in enumerate(folds.split(df_train.values, df_train
                                    df_train.iterrows()]
     df_test["predicted_label"] = [assign_value_redesigned(album_lookup_table, artist_lookup_table, r) for i, r in
                                   df_test.iterrows()]
-    print("No imputation: Train\n")
+    
+    print("Pre imputation: Train")
     print(df_train.iloc[trn_idx][chosen_features].isnull().sum())
-    print("No imputation: Val\n")
+    print("Pre imputation: Val\n")
     print(df_train.iloc[val_idx][chosen_features].isnull().sum())
-    print("No imputation: Test\n")
+    print("Pre imputation: Test\n")
     print(df_test[chosen_features].isnull().sum())
 
-    train_weights = compute_sample_weight('balanced', df_train.iloc[trn_idx].label)
+    df_train.iloc[trn_idx][chosen_features] = impute_missing_values_by_knn(df_train.iloc[trn_idx][chosen_features], k=5)
+    df_train.iloc[val_idx][chosen_features] = impute_missing_values_by_knn(df_train.iloc[val_idx][chosen_features], k=5)
+    df_test[chosen_features] = impute_missing_values_by_knn(df_test[chosen_features], k=5)
 
-    trn_data = lgb.Dataset(df_train.iloc[trn_idx][chosen_features],
-                           label=labels.iloc[trn_idx],params={'verbose': -1},
-                           free_raw_data=False,
-                           weight=train_weights)
+    print("After imputation: Train\n")
+    print(df_train.iloc[trn_idx][chosen_features].isnull().sum())
+    print("After imputation: Val\n")
+    print(df_train.iloc[val_idx][chosen_features].isnull().sum())
+    print("After imputation: Test\n")
+    print(df_test[chosen_features].isnull().sum())
 
+    trn_data = lgb.Dataset(df_train.iloc[trn_idx][chosen_features], label=labels.iloc[trn_idx],params={'verbose': -1}, free_raw_data=False)
     val_data = lgb.Dataset(df_train.iloc[val_idx][chosen_features], label=labels.iloc[val_idx],params={'verbose': -1}, free_raw_data=False)
     clf = lgb.train(param, trn_data, 1000000, valid_sets=[trn_data, val_data], verbose_eval=5000,
                     early_stopping_rounds=20000)
@@ -116,5 +124,5 @@ print("RMSE: {:<8.5f}".format(sqrt(mean_squared_error(df_train.label, oof))))
 sub = pd.DataFrame({"ID": df_test.ID.values})
 sub["label"] = predictions.round(decimals=4)
 mean_rmse, std_rmse = print_rmse(df_train, oof)
-sub.to_csv(f"baseline3_fixedArtistIdFeatures_{mean_rmse:.4f}_{std_rmse:.4f}.csv", index=False, header=False)
+sub.to_csv(f"baseline5_lyric_impute_{mean_rmse:.4f}_{std_rmse:.4f}.csv", index=False, header=False)
 print("The number of best number of iterations was:", np.array(best_stopping_iterations_list).mean(), "+/-", np.array(best_stopping_iterations_list).std())
