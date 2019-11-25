@@ -5,7 +5,7 @@ The /data folder is organized as followed: MP3 files in 3 sub directors: "/data/
 Structure the data in local machine similar to how Zalo structured which describe above
 
 # How to run this docker
-sudo docker run -v <path-to-local-dir-zalo-data>:/data -v <path-to-local-dir-for-saving-submisison-file>:/result <name-of-docker-image> /bin/bash /model/predict.sh
+sudo docker run -v `<path-to-local-dir-zalo-data>`:/data -v `<path-to-local-dir-for-saving-submisison-file>`:/result `<name-of-docker-image>` /bin/bash /model/predict.sh
 
 Note: This docker will:
 + Running a python script to generate metadata.csv first
