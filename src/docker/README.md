@@ -32,3 +32,6 @@ Note: This docker will:
 - Export docker image
 
  `docker save –o [output file] [image id]`
+
+ - Digest:
+ `sha256:a66cb0e7e105f5971c84107ccf495bacb7862cb874f3bbaf0a25f1db27ef8451`
