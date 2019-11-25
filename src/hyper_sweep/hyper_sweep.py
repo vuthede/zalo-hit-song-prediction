@@ -96,12 +96,15 @@ def objective(params, reporter):
         params[parameter_name] = int(params[parameter_name])
 
     start = timer()
-
+    if params['boosting_type'] == 'dart':
+        early_stopping_rounds = 0
+    else:
+        early_stopping_rounds = 100
     # Perform n_folds cross validation
     cv_results = perform_cv_lightgbm(df_train,
                                      chosen_features,
                                      params=params,
-                                     early_stopping_rounds=100,
+                                     early_stopping_rounds=early_stopping_rounds,
                                      n_folds=5)
     # lgb.cv(params, train_set, num_boost_round = 10000, nfold = n_folds,
     #                    early_stopping_rounds = 100, metrics = 'auc', seed = 50)
