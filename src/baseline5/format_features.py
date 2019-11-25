@@ -440,10 +440,10 @@ def assign_value_redesigned(album_table, artist_table, row):
             assert artist_rank_stats['count'] >= 1
             assert album_rank_stats['count'] >= 1
             return (artist_rank_stats['count'] * artist_rank_stats['mean'] + album_rank_stats['count'] * album_rank_stats['mean']) / (artist_rank_stats['count'] + album_rank_stats['count'])
-        elif trust_artist:
-            return artist_rank_stats["mean"]
         elif trust_album:
             return album_rank_stats["mean"]
+        elif trust_artist:
+            return artist_rank_stats["mean"]
         else:
             return np.nan
 
@@ -507,7 +507,7 @@ def assign_artist_features_inplace(df):
             if art_dict['count'][id] > temp_count:
                 temp_count = art_dict['count'][id]
                 temp_id = id
-        if art_dict['count'][id] == 0:
+        if art_dict['count'][id] <= 1:
             temp_id = np.nan
 
         return temp_id
@@ -521,7 +521,9 @@ def assign_artist_features_inplace(df):
             if art_dict['mean'][id] < temp_mean:
                 temp_mean = art_dict['mean'][id]
                 temp_id = id
-        if math.isnan(art_dict['mean'][id]):
+        #if math.isnan(art_dict['mean'][id]):
+        #    temp_id = np.nan
+        if math.isnan(art_dict['std'][id]):
             temp_id = np.nan
         return temp_id
 
