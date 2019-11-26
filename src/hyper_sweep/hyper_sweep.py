@@ -94,10 +94,10 @@ def objective(params, reporter):
         params[parameter_name] = int(params[parameter_name])
 
     start = timer()
-    if params['boosting_type'] == 'dart':
-        early_stopping_rounds = -999999 # seems to sometimes incremenet???
-    else:
-        early_stopping_rounds = 1000
+    #if params['boosting_type'] == 'dart':
+    #    early_stopping_rounds = -999999 # seems to sometimes incremenet???
+    #else:
+    early_stopping_rounds = 1000
     # Perform n_folds cross validation
     cv_results = perform_cv_lightgbm(df_train,
                                      chosen_features,
@@ -123,7 +123,14 @@ def objective(params, reporter):
     #                 run_time])
 
     # Ray will negate this by itself to feed into HyperOpt
-    reporter(timesteps_total=1, mean_loss=cv_results['rmse_std'])
+    reporter(timesteps_total=1,
+             mean_loss=cv_results['rmse_mean'],
+             rmse_std=cv_results['rmse_std'],
+             best_stopping_iter=cv_results['cv_stopping_iters'],
+             best_stopping_iter_mean=cv_results['best_stopping_iter_mean'],
+             best_stopping_iter_std = cv_results['best_stopping_iter_std'],
+             train_time = run_time )
+
 
     # Dictionary with information for evaluation
     return {'loss': loss,

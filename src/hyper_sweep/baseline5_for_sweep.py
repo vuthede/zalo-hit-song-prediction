@@ -109,7 +109,7 @@ def perform_cv_lightgbm(df_train, chosen_features, params, early_stopping_rounds
                                free_raw_data=False,
                                weight=train_weights)
         val_data = lgb.Dataset(df_train.iloc[val_idx][chosen_features], label=labels.iloc[val_idx],params={'verbose': -1}, free_raw_data=False)
-        clf = lgb.train(params, trn_data, 10000, valid_sets=[trn_data, val_data], verbose_eval=5000,
+        clf = lgb.train(params, trn_data, 1000000, valid_sets=[trn_data, val_data], verbose_eval=5000,
                         early_stopping_rounds=early_stopping_rounds)
         oof[val_idx] = clf.predict(df_train.iloc[val_idx][chosen_features], num_iteration=clf.best_iteration)
         #predictions += clf.predict(df_test[chosen_features], num_iteration=clf.best_iteration) / folds.n_splits
@@ -126,6 +126,6 @@ def perform_cv_lightgbm(df_train, chosen_features, params, early_stopping_rounds
                   'best_stopping_iter_mean': np.array(best_stopping_iterations_list).mean(),
                   'best_stopping_iter_std': np.array(best_stopping_iterations_list).std()}
     #sub.to_csv(f"baseline4_exp_assign_artist_features_inplace_refactoredstd_assign_value_redesigned_refactored_albumstrat{mean_rmse:.4f}_{std_rmse:.4f}.csv", index=False, header=False)
-    #print("The number of best number of iterations was:", np.array(best_stopping_iterations_list).mean(), "+/-", np.array(best_stopping_iterations_list).std())
+    print("The number of best number of iterations was:", np.array(best_stopping_iterations_list).mean(), "+/-", np.array(best_stopping_iterations_list).std())
 
     return cv_results
