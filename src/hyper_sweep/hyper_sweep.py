@@ -1,5 +1,3 @@
-%load_ext autoreload
-%autoreload 2
 # https://towardsdatascience.com/automated-machine-learning-hyperparameter-tuning-in-python-dfda59b72f8a
 # https://github.com/WillKoehrsen/hyperparameter-optimization/blob/master/Bayesian%20Hyperparameter%20Optimization%20of%20Gradient%20Boosting%20Machine.ipynb
 from hyperopt import hp
@@ -29,8 +27,8 @@ space = {
     'boosting_type': hp.choice('boosting_type',
                                [{'boosting_type': 'gbdt',
                                  'subsample': hp.uniform('gdbt_subsample', 0.5, 1)},
-                                {'boosting_type': 'dart',
-                                 'subsample': hp.uniform('dart_subsample', 0.5, 1)},
+                                #{'boosting_type': 'dart',
+                                # 'subsample': hp.uniform('dart_subsample', 0.5, 1)},
                                 {'boosting_type': 'goss'}]),
     'num_leaves': hp.choice('num_leaves', np.arange(30, 151, dtype=int)),
     'learning_rate': hp.loguniform('learning_rate', np.log(0.005), np.log(0.1)),
@@ -97,9 +95,9 @@ def objective(params, reporter):
 
     start = timer()
     if params['boosting_type'] == 'dart':
-        early_stopping_rounds = 0
+        early_stopping_rounds = -999999 # seems to sometimes incremenet???
     else:
-        early_stopping_rounds = 100
+        early_stopping_rounds = 1000
     # Perform n_folds cross validation
     cv_results = perform_cv_lightgbm(df_train,
                                      chosen_features,
@@ -147,7 +145,7 @@ ITERATION = 0
 
 # https://github.com/ray-project/ray/blob/master/python/ray/tune/examples/hyperopt_example.py
 config = {
-    "num_samples": 100,
+    "num_samples": 200,
     "config": {
         "iterations": 100,  # passed to our objective --> no effect I think
     },
@@ -165,9 +163,16 @@ algo = HyperOptSearch(
 
 
 scheduler = AsyncHyperBandScheduler(metric="mean_loss", mode="min")
-run(objective,
-    name="hyperparam_sweep1",
+analysis = run(objective,
+    name="hyperparam_sweep6",
     search_alg=algo,
     scheduler=scheduler,
     loggers=[ray.tune.logger.CSVLogger, ray.tune.logger.JsonLogger],
     **config)
+
+import pickle
+with open(r"hyper_sweep_analysis.pickle", "wb") as output_file:
+    pickle.dump(analysis, output_file)
+# pip install tabulate
+# tune list-trials ~/ray_results/hyperparam_sweep6/ --output result.csv
+ 
