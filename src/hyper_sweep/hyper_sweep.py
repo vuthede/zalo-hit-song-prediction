@@ -31,7 +31,7 @@ space = {
                                 # 'subsample': hp.uniform('dart_subsample', 0.5, 1)},
                                 {'boosting_type': 'goss'}]),
     'num_leaves': hp.choice('num_leaves', np.arange(30, 151, dtype=int)),
-    'learning_rate': hp.loguniform('learning_rate', np.log(0.005), np.log(0.1)),
+    'learning_rate': hp.loguniform('learning_rate', np.log(0.0008), np.log(0.0015)),
     'subsample_for_bin': hp.choice('subsample_for_bin', np.arange(1, 16, dtype=int)),
     'min_child_samples': hp.choice('min_child_examples', np.arange(4, 101, dtype=int)),
     'reg_alpha': hp.uniform('reg_alpha', 0.0, 1.0),
@@ -94,18 +94,13 @@ def objective(params, reporter):
         params[parameter_name] = int(params[parameter_name])
 
     start = timer()
-    #if params['boosting_type'] == 'dart':
-    #    early_stopping_rounds = -999999 # seems to sometimes incremenet???
-    #else:
-    early_stopping_rounds = 1000
+    early_stopping_rounds = 20000
     # Perform n_folds cross validation
     cv_results = perform_cv_lightgbm(df_train,
                                      chosen_features,
                                      params=params,
                                      early_stopping_rounds=early_stopping_rounds,
-                                     n_folds=5)
-    # lgb.cv(params, train_set, num_boost_round = 10000, nfold = n_folds,
-    #                    early_stopping_rounds = 100, metrics = 'auc', seed = 50)
+                                     n_folds=10)
 
     run_time = timer() - start
 
@@ -152,12 +147,12 @@ ITERATION = 0
 
 # https://github.com/ray-project/ray/blob/master/python/ray/tune/examples/hyperopt_example.py
 config = {
-    "num_samples": 200,
+    "num_samples": 400,
     "config": {
-        "iterations": 100,  # passed to our objective --> no effect I think
+        "iterations": 99999,  # passed to our objective --> no effect I think
     },
     "stop": {
-        "timesteps_total": 999 # Passed to our objective --> no effect I think but can be used to stop a job early I think.
+        "timesteps_total": 99999 # Passed to our objective --> no effect I think but can be used to stop a job early I think.
     },
 }
 
@@ -167,19 +162,19 @@ algo = HyperOptSearch(
     metric="mean_loss",
     mode="min")
 
-
-
 scheduler = AsyncHyperBandScheduler(metric="mean_loss", mode="min")
 analysis = run(objective,
-    name="hyperparam_sweep6",
+    name="hyperparam_sweep9",
     search_alg=algo,
     scheduler=scheduler,
     loggers=[ray.tune.logger.CSVLogger, ray.tune.logger.JsonLogger],
     **config)
 
 import pickle
-with open(r"hyper_sweep_analysis.pickle", "wb") as output_file:
+with open(r"hyper_sweep_analysis9.pickle", "wb") as output_file:
     pickle.dump(analysis, output_file)
+
+analysis.dataframe().to_csv("results_complete9.csv")
 # pip install tabulate
 # tune list-trials ~/ray_results/hyperparam_sweep6/ --output result.csv
  
