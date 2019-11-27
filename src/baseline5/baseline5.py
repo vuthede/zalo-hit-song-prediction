@@ -105,7 +105,7 @@ for fold_, (trn_idx, val_idx) in enumerate(folds.split(df_train.values, df_train
                            free_raw_data=False,
                            weight=train_weights)
     val_data = lgb.Dataset(df_train.iloc[val_idx][chosen_features], label=labels.iloc[val_idx],params={'verbose': -1}, free_raw_data=False)
-    clf = lgb.train(param, trn_data, 1000000, valid_sets=[trn_data, val_data], verbose_eval=5000,
+    clf = lgb.train(param, trn_data, 1000000, valid_sets=[trn_data, val_data], verbose_eval=x,
                     early_stopping_rounds=20000)
     oof[val_idx] = clf.predict(df_train.iloc[val_idx][chosen_features], num_iteration=clf.best_iteration)
     predictions += clf.predict(df_test[chosen_features], num_iteration=clf.best_iteration) / folds.n_splits
