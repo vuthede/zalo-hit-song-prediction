@@ -170,9 +170,9 @@ for fold_, (trn_idx, val_idx) in enumerate(folds.split(df_train.values, df_train
 
     #clf = lgb.train(param, trn_data, 1000000, valid_sets=[trn_data, val_data], verbose_eval=5000,
     #                early_stopping_rounds=20000)
-    oof[val_idx] = clf.predict(df_train.iloc[val_idx][chosen_features], num_iteration=clf.best_iteration)
-    predictions += clf.predict(df_test[chosen_features], num_iteration=clf.best_iteration) / folds.n_splits
-    best_stopping_iterations_list.append(clf.best_iteration)
+    oof[val_idx] = clf.predict(df_train.iloc[val_idx][chosen_features], num_iteration=clf._best_iteration)
+    predictions += clf.predict(df_test[chosen_features], num_iteration=clf._best_iteration) / folds.n_splits
+    best_stopping_iterations_list.append(clf._best_iteration)
 
 print("RMSE: {:<8.5f}".format(sqrt(mean_squared_error(df_train.label, oof))))
 sub = pd.DataFrame({"ID": df_test.ID.values})
