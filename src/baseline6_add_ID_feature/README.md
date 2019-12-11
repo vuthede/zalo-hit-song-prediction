@@ -1,1 +1,0 @@
-album stratification and refactored
