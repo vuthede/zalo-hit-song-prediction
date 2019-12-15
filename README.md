@@ -39,7 +39,7 @@
 + Parsed mp3 metadata strings into various binary flags which seem to show relationship with rank, an example being isBeat whereby 'beat' tagged albums tends to result in worse rank.  
 + We realised that the release time for a given album often had the same corresponding second, and thus by grouping songs by release time we are able to produce a powerful feature describing the album
 --> We used label encoding for a lot of these large categorical features. We discovered the artist id feature seemed to be encoding some information about how old the artist is (likely created in order of artist reaching Zalo). As, intuitively, very old artists are less likely to be top hits, and label encoding keeps this ordering, the decision tree-based model we were using could take advantage of this 'hidden' information.
-+ Using lightgbm model with 10 folds
++ Using average of predictions across 10 lightgbm models from 10 CV folds. We tried the maybe more conventional approach of regularising and training on 100% of the training data but found the model significantly overfit compared to 10 CV fold method.  
 + Split dataset by album instead of by label (ranks) then weight loss by rank to account for small class imbalance
 + Using target encoding using album, artist and ranks information. Based on the fact the songs with the same album and artist tend to have the same rank.
 
