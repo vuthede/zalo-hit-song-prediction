@@ -1,3 +1,8 @@
+# Result in 2019 Zalo Hit Song Prediction AI Competition
+
+2nd Place Public Leaderboard: 1.48740	RMSE
+2nd Place Private Leaderboard: 1.48030	RMSE
+
 # Quick run to see the result
 - Install necessary libs
 
@@ -28,7 +33,19 @@
 
 `utils.py`. Some helper functions
 
-# Some key ideas 
+
+# Some key ideas in our solution
+
++ Parsed mp3 metadata strings into various binary flags which seem to show relationship with rank, an example being isBeat whereby 'beat' tagged albums tends to result in worse rank.  
++ Realised that the release time for a given album often had the same corresponding second, and thus by grouping songs by release time we are able to produce a powerful feature describing the album
+--> We used label encoding for a lot of these large categorical features. We discovered the artist id feature seemed to be encoding some information about how old the artist is (likely created in order of artist reaching Zalo). As, intuitively, very old artists are less likely to be top hits, and label encoding keeps this ordering, the decision tree-based model we were using could take advantage of this 'hidden' information.
 + Using lightgbm model with 10 folds
-+ Split dataset by album instead of by label (ranks)
-+ Using target encoding using album, artist and ranks information. Baased on the fact the songs with the same album and artist tend to have the same rank.
++ Split dataset by album instead of by label (ranks) then weight loss by rank to account for small class imbalance
++ Using target encoding using album, artist and ranks information. Based on the fact the songs with the same album and artist tend to have the same rank.
+
+# Things we tried that didn't work out
+
++ Adding in features generated from short clip of the raw audio using the fantastic essentia library MusicExtractor function. Lightgbm mostly ignored them relative to our final features
++ We made some models training exclusively on the lyrics (Hashed) and got RMSE around 3.5, then tried adding this model's rank predicton as a feature. Sometimes saw small improvement, but sometimes not, so ran out of time to incorporate it to final model.
++ Did extensive hyperparameter sweep using hyperopt but didn't get much improvement compared to manual tuning
++ We ran out of time to incorporate a kNN model, this should have help for cases where test data has duplicate (or almost duplicate) songs to the training data 
